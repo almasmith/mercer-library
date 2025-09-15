@@ -17,6 +17,8 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.*" />
     <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="*" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="*" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="*" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="*" />
   </ItemGroup>
 
 </Project>
