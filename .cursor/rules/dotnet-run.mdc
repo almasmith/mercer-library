@@ -1,0 +1,6 @@
+---
+description: WHEN running dotnet run command
+alwaysApply: false
+---
+
+When you run the dotnet run command, first make sure that intended port is not already in use from a previous run command.
