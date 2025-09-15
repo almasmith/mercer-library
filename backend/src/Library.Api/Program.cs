@@ -7,7 +7,37 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Options binding with validation and ValidateOnStart
+builder.Services
+    .AddOptions<Library.Api.Configuration.JwtOptions>()
+    .Bind(builder.Configuration.GetSection("JWT"))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+
+builder.Services
+    .AddOptions<Library.Api.Configuration.CorsOptions>()
+    .Bind(builder.Configuration.GetSection("CORS"))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+
+builder.Services
+    .AddOptions<Library.Api.Configuration.DatabaseOptions>()
+    .Bind(builder.Configuration)
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+
+builder.Services
+    .AddOptions<Library.Api.Configuration.RateLimitOptions>()
+    .Bind(builder.Configuration.GetSection("RateLimiting"))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+
 var app = builder.Build();
+// Log on successful startup to evidence options validation passed
+app.Lifetime.ApplicationStarted.Register(() =>
+{
+    app.Logger.LogInformation("Configuration options validated successfully");
+});
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
