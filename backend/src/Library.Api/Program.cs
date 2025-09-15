@@ -180,6 +180,8 @@ app.UseHttpsRedirection();
 // CORS: must be placed before authentication/authorization
 app.UseCors("SpaCors");
 
+app.UseMiddleware<Library.Api.Middleware.ExceptionHandlingMiddleware>();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
