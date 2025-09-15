@@ -10,6 +10,8 @@ using Library.Api.Configuration;
 using Swashbuckle.AspNetCore.Filters;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.HttpLogging;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +27,20 @@ builder.Services.AddControllers().AddJsonOptions(o =>
     o.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
     o.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
     o.JsonSerializerOptions.Converters.Add(new Library.Api.Serialization.DateTimeOffsetUtcJsonConverter());
+})
+.ConfigureApiBehaviorOptions(o =>
+{
+    o.InvalidModelStateResponseFactory = ctx =>
+    {
+        var correlationId = ctx.HttpContext.Response.Headers["X-Correlation-ID"].ToString();
+        var vpd = new ValidationProblemDetails(ctx.ModelState)
+        {
+            Status = StatusCodes.Status400BadRequest,
+            Title = "One or more validation errors occurred.",
+            Instance = $"{ctx.HttpContext.Request.Path}?cid={correlationId}"
+        };
+        return new BadRequestObjectResult(vpd) { ContentTypes = { "application/problem+json" } };
+    };
 });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
