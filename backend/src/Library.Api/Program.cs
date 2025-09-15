@@ -9,8 +9,14 @@ using System.Text;
 using Library.Api.Configuration;
 using Swashbuckle.AspNetCore.Filters;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.HttpLogging;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Configure logging
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.AddJsonConsole();
 
 // Add services to the container.
 
@@ -157,6 +163,16 @@ builder.Services.AddScoped<Library.Api.Services.IJwtTokenService, Library.Api.Se
 builder.Services.AddHealthChecks()
     .AddDbContextCheck<LibraryDbContext>("db", tags: new[] { "ready" });
 
+// HTTP request/response logging with safe fields only
+builder.Services.AddHttpLogging(o =>
+{
+    o.LoggingFields = HttpLoggingFields.RequestPath
+        | HttpLoggingFields.RequestMethod
+        | HttpLoggingFields.ResponseStatusCode
+        | HttpLoggingFields.Duration;
+    // Do not log Authorization headers or bodies
+});
+
 var app = builder.Build();
 // Log on successful startup to evidence options validation passed
 app.Lifetime.ApplicationStarted.Register(() =>
@@ -173,6 +189,9 @@ app.Lifetime.ApplicationStarted.Register(() =>
 // Configure the HTTP request pipeline.
 // Correlation ID must be first to capture/propagate for all following middleware (including Swagger & seeding)
 app.UseMiddleware<Library.Api.Middleware.CorrelationIdMiddleware>();
+
+// HTTP logging (requests/responses) - after correlation id so scope includes it
+app.UseHttpLogging();
 
 if (app.Environment.IsDevelopment())
 {
