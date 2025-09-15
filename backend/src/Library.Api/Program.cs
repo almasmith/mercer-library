@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Library.Api.Configuration;
 using Swashbuckle.AspNetCore.Filters;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -152,6 +153,10 @@ builder.Services.AddIdentityCore<ApplicationUser>(o =>
 // Register JWT token service
 builder.Services.AddScoped<Library.Api.Services.IJwtTokenService, Library.Api.Services.JwtTokenService>();
 
+// Health checks: liveness and readiness (DB)
+builder.Services.AddHealthChecks()
+    .AddDbContextCheck<LibraryDbContext>("db", tags: new[] { "ready" });
+
 var app = builder.Build();
 // Log on successful startup to evidence options validation passed
 app.Lifetime.ApplicationStarted.Register(() =>
@@ -187,6 +192,10 @@ app.UseMiddleware<Library.Api.Middleware.ExceptionHandlingMiddleware>();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Health check endpoints
+app.MapHealthChecks("/health").AllowAnonymous();
+app.MapHealthChecks("/health/ready", new HealthCheckOptions { Predicate = r => r.Tags.Contains("ready") }).AllowAnonymous();
 
 app.MapControllers();
 
