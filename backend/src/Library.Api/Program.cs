@@ -25,6 +25,24 @@ builder.Services
     .ValidateDataAnnotations()
     .ValidateOnStart();
 
+// CORS: register SpaCors policy reading allowed origins from configuration
+var allowedOrigins = builder.Configuration.GetSection("CORS").GetValue<string>("AllowedOrigins") ?? string.Empty;
+var allowedOriginsArray = allowedOrigins
+    .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+    .Where(o => !string.IsNullOrWhiteSpace(o))
+    .Distinct(StringComparer.OrdinalIgnoreCase)
+    .ToArray();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("SpaCors", policy =>
+        policy
+            .WithOrigins(allowedOriginsArray)
+            .WithMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+            .WithHeaders("Authorization", "Content-Type", "If-Match", "If-None-Match", "X-Correlation-ID")
+            .WithExposedHeaders("ETag", "X-Correlation-ID"));
+});
+
 builder.Services
     .AddOptions<Library.Api.Configuration.DatabaseOptions>()
     .Bind(builder.Configuration)
@@ -52,6 +70,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// CORS: must be placed before authentication/authorization
+app.UseCors("SpaCors");
 
 app.UseAuthorization();
 
