@@ -1,0 +1,74 @@
+# Root .gitignore for Mercer monorepo
+# Covers .NET (SDK, ASP.NET Core), Node/Next.js, common IDEs, OS junk, and test artifacts
+
+# =========================
+# OS
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# General logs and caches
+# =========================
+*.log
+logs/
+.cache/
+
+# =========================
+# Editors / IDE
+# =========================
+.idea/
+.vs/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# =========================
+# .NET / C#
+# =========================
+**/bin/
+**/obj/
+TestResults/
+*.user
+*.rsuser
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider / ReSharper caches
+_ReSharper.Caches/
+.ionide/
+
+# =========================
+# Node / Next.js
+# =========================
+node_modules/
+.next/
+.turbo/
+out/
+dist/
+build/
+.vercel/
+coverage/
+.nyc_output/
+
+# Package manager debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+bun-debug.log*
+
+# Env files (keep examples)
+.env
+.env.*
+!.env.example
+
+# =========================
+# Misc tools
+# =========================
+.eslintcache
+.stylelintcache
+.tsbuildinfo
+
+
