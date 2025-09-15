@@ -44,7 +44,7 @@ public sealed class AuthController : ControllerBase
     [SwaggerRequestExample(typeof(RegisterRequest), typeof(RegisterRequestExample))]
     [SwaggerResponseExample(StatusCodes.Status200OK, typeof(AuthResponseExample))]
     [SwaggerResponse(StatusCodes.Status400BadRequest, "Validation errors", typeof(ValidationProblemDetails))]
-    [SwaggerResponse(StatusCodes.Status409Conflict, "Email already exists", typeof(ProblemDetails))]
+    [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(RegisterValidationProblemExample))]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request, CancellationToken ct)
     {
         if (!ModelState.IsValid)
@@ -55,12 +55,8 @@ public sealed class AuthController : ControllerBase
         var existing = await _userManager.FindByEmailAsync(request.Email);
         if (existing is not null)
         {
-            return Conflict(new ProblemDetails
-            {
-                Title = "Email already in use",
-                Detail = "A user with that email already exists.",
-                Status = StatusCodes.Status409Conflict
-            });
+            ModelState.AddModelError("email", "A user with that email already exists.");
+            return ValidationProblem(ModelState);
         }
 
         var user = new ApplicationUser
