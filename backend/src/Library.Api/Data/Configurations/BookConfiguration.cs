@@ -37,8 +37,10 @@ namespace Library.Api.Data.Configurations
             builder.Property(b => b.UpdatedAt)
                 .IsRequired();
 
+            // Use a concurrency token that is not database-generated to support SQLite
             builder.Property(b => b.RowVersion)
-                .IsRowVersion();
+                .IsConcurrencyToken()
+                .ValueGeneratedNever();
 
             builder.HasIndex(b => new { b.OwnerUserId, b.Genre })
                 .HasDatabaseName("IX_Books_OwnerUserId_Genre");

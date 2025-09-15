@@ -1,4 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using Library.Api.Domain;
+using Library.Api.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -95,6 +98,12 @@ builder.Services
     });
 }
 
+// Identity (for UserManager used by DevSeeder)
+builder.Services
+    .AddIdentityCore<ApplicationUser>()
+    .AddRoles<IdentityRole<Guid>>()
+    .AddEntityFrameworkStores<Library.Api.Data.LibraryDbContext>();
+
 var app = builder.Build();
 // Log on successful startup to evidence options validation passed
 app.Lifetime.ApplicationStarted.Register(() =>
@@ -113,6 +122,9 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+
+    // Development data seeding (idempotent)
+    await DevSeeder.SeedAsync(app.Services, CancellationToken.None);
 }
 
 app.UseHttpsRedirection();
