@@ -2,6 +2,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Library.Api.Domain;
 using Library.Api.Data;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Library.Api.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +27,26 @@ builder.Services
     .Bind(builder.Configuration.GetSection("JWT"))
     .ValidateDataAnnotations()
     .ValidateOnStart();
+
+// JWT authentication
+var jwtOptions = builder.Configuration.GetSection("JWT").Get<JwtOptions>() ?? throw new InvalidOperationException("JWT configuration is missing.");
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(o =>
+    {
+        o.RequireHttpsMetadata = false;
+        o.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Secret)),
+            ValidateIssuer = true,
+            ValidIssuer = jwtOptions.Issuer,
+            ValidateAudience = true,
+            ValidAudience = jwtOptions.Audience,
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.FromMinutes(1)
+        };
+    });
+builder.Services.AddAuthorization();
 
 builder.Services
     .AddOptions<Library.Api.Configuration.CorsOptions>()
@@ -113,6 +137,9 @@ builder.Services.AddIdentityCore<ApplicationUser>(o =>
     .AddEntityFrameworkStores<LibraryDbContext>()
     .AddSignInManager();
 
+// Register JWT token service
+builder.Services.AddScoped<Library.Api.Services.IJwtTokenService, Library.Api.Services.JwtTokenService>();
+
 var app = builder.Build();
 // Log on successful startup to evidence options validation passed
 app.Lifetime.ApplicationStarted.Register(() =>
@@ -141,6 +168,7 @@ app.UseHttpsRedirection();
 // CORS: must be placed before authentication/authorization
 app.UseCors("SpaCors");
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
