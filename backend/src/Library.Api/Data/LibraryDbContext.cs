@@ -13,6 +13,7 @@ namespace Library.Api.Data
 
         public DbSet<Book> Books { get; set; } = null!;
         public DbSet<Favorite> Favorites { get; set; } = null!;
+        public DbSet<BookRead> BookReads { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -20,6 +21,7 @@ namespace Library.Api.Data
 
             modelBuilder.ApplyConfiguration(new BookConfiguration());
             modelBuilder.ApplyConfiguration(new FavoriteConfiguration());
+            modelBuilder.ApplyConfiguration(new BookReadConfiguration());
         }
     }
 }
