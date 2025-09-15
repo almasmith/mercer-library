@@ -72,3 +72,9 @@ bun-debug.log*
 .tsbuildinfo
 
 
+# =========================
+# SQLite dev databases
+# =========================
+backend/src/Library.Api/Data/*.db*
+backend/src/Library.Api/data/*.db*
+
