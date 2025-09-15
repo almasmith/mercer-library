@@ -12,12 +12,14 @@ namespace Library.Api.Data
         public LibraryDbContext(DbContextOptions<LibraryDbContext> options) : base(options) {}
 
         public DbSet<Book> Books { get; set; } = null!;
+        public DbSet<Favorite> Favorites { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.ApplyConfiguration(new BookConfiguration());
+            modelBuilder.ApplyConfiguration(new FavoriteConfiguration());
         }
     }
 }
