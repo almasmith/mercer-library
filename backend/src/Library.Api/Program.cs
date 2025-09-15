@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Library.Api.Domain;
 using Library.Api.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Library.Api.Configuration;
@@ -52,7 +53,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ClockSkew = TimeSpan.FromMinutes(1)
         };
     });
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(o =>
+{
+	o.FallbackPolicy = new AuthorizationPolicyBuilder()
+		.RequireAuthenticatedUser()
+		.Build();
+});
 
 builder.Services
     .AddOptions<Library.Api.Configuration.CorsOptions>()
