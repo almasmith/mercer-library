@@ -166,6 +166,9 @@ app.Lifetime.ApplicationStarted.Register(() =>
 }
 
 // Configure the HTTP request pipeline.
+// Correlation ID must be first to capture/propagate for all following middleware (including Swagger & seeding)
+app.UseMiddleware<Library.Api.Middleware.CorrelationIdMiddleware>();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

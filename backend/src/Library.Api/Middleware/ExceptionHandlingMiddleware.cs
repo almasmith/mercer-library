@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
+using Library.Api.Infrastructure;
 
 namespace Library.Api.Middleware
 {
@@ -29,7 +30,7 @@ namespace Library.Api.Middleware
             }
             catch (Exception ex)
             {
-                var correlationId = GetOrCreateCorrelationId(context);
+                var correlationId = CorrelationIdAccessor.Get(context);
                 var (statusCode, title) = MapExceptionToStatusAndTitle(ex);
 
                 var problem = new ProblemDetails
@@ -46,6 +47,8 @@ namespace Library.Api.Middleware
                 context.Response.Clear();
                 context.Response.StatusCode = statusCode;
                 context.Response.ContentType = "application/problem+json";
+                // Ensure correlation id header is preserved/echoed after Clear();
+                context.Response.Headers[CorrelationIdMiddleware.CorrelationIdHeaderName] = correlationId;
 
                 var json = JsonSerializer.Serialize(problem, new JsonSerializerOptions
                 {
@@ -56,19 +59,7 @@ namespace Library.Api.Middleware
             }
         }
 
-        private static string GetOrCreateCorrelationId(HttpContext context)
-        {
-            if (context.Request.Headers.TryGetValue(CorrelationIdHeaderName, out var existing) && !string.IsNullOrWhiteSpace(existing))
-            {
-                var cid = existing.ToString();
-                context.Response.Headers[CorrelationIdHeaderName] = cid;
-                return cid;
-            }
-
-            var correlationId = Guid.NewGuid().ToString("N");
-            context.Response.Headers[CorrelationIdHeaderName] = correlationId;
-            return correlationId;
-        }
+        // Removed local correlation id creation; handled by CorrelationIdMiddleware/Accessor
 
         private static (int statusCode, string title) MapExceptionToStatusAndTitle(Exception ex)
         {
