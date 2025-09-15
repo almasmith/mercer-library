@@ -4,24 +4,24 @@ Note: Backend-only. Excludes all frontend and broader DevOps (Docker/CI/CD) task
 
 ### Track A — Project Scaffolding & Configuration
 
-- [B1] Initialize solution and projects
+- [B1] Initialize solution and projects (Completed)
   - Create .NET solution, Web API project `Library.Api`, and test project `Library.Tests`.
   - Add basic `Program.cs` with controllers and Swagger enabled in Development.
   - DoD: Projects build and run; Swagger UI reachable.
 
-- [B2] Add core NuGet packages
+- [B2] Add core NuGet packages (Completed)
   - EF Core (Sqlite, SqlServer, Design), Identity EF, JWT Bearer, Swashbuckle, FluentValidation, AutoMapper, SignalR.
   - DoD: `dotnet restore` succeeds; packages referenced in `.csproj` files.
 
-- [B3] App configuration & options binding
+- [B3] App configuration & options binding (Completed)
   - Bind `DB_PROVIDER`, connection strings, JWT settings, CORS allowed origins, rate limit options.
   - DoD: Options validated on startup; invalid config fails fast with clear log.
 
-- [B4] JSON serialization conventions
+- [B4] JSON serialization conventions (Completed)
   - Configure `System.Text.Json` camelCase, ISO 8601; ensure `DateTimeOffset` UTC.
   - DoD: Sample endpoint returns camelCased JSON; dates are ISO with Z.
 
-- [B5] CORS policy
+- [B5] CORS policy (Completed)
   - Configure named policy from `CORS__AllowedOrigins` (comma-separated).
   - DoD: Preflight passes from configured origin; blocked from others.
 

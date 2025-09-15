@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -55,12 +57,56 @@ builder.Services
     .ValidateDataAnnotations()
     .ValidateOnStart();
 
+// Database provider selection and DbContext registration
+{
+    var dbOptions = new Library.Api.Configuration.DatabaseOptions();
+    builder.Configuration.Bind(dbOptions);
+
+    var provider = dbOptions.DbProvider?.Trim().ToLowerInvariant();
+
+    if (string.IsNullOrWhiteSpace(provider))
+    {
+        throw new InvalidOperationException("DB provider is not configured. Set DB_PROVIDER to 'sqlite' or 'sqlserver'.");
+    }
+
+    var connectionStrings = dbOptions.ConnectionStrings ?? new Library.Api.Configuration.DatabaseOptions.DatabaseConnectionStrings();
+
+    builder.Services.AddDbContext<Library.Api.Data.LibraryDbContext>(options =>
+    {
+        switch (provider)
+        {
+            case "sqlite":
+                if (string.IsNullOrWhiteSpace(connectionStrings.Sqlite))
+                {
+                    throw new InvalidOperationException("Sqlite connection string is not configured under ConnectionStrings:Sqlite.");
+                }
+                options.UseSqlite(connectionStrings.Sqlite);
+                break;
+            case "sqlserver":
+                if (string.IsNullOrWhiteSpace(connectionStrings.SqlServer))
+                {
+                    throw new InvalidOperationException("SqlServer connection string is not configured under ConnectionStrings:SqlServer.");
+                }
+                options.UseSqlServer(connectionStrings.SqlServer);
+                break;
+            default:
+                throw new InvalidOperationException($"Unsupported DB provider '{dbOptions.DbProvider}'. Supported providers: sqlite, sqlserver.");
+        }
+    });
+}
+
 var app = builder.Build();
 // Log on successful startup to evidence options validation passed
 app.Lifetime.ApplicationStarted.Register(() =>
 {
     app.Logger.LogInformation("Configuration options validated successfully");
 });
+
+// Also log selected DB provider
+{
+    var dbOptions = app.Services.GetRequiredService<Microsoft.Extensions.Options.IOptions<Library.Api.Configuration.DatabaseOptions>>().Value;
+    app.Logger.LogInformation("Using database provider: {Provider}", dbOptions.DbProvider);
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
