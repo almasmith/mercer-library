@@ -99,10 +99,19 @@ builder.Services
 }
 
 // Identity (for UserManager used by DevSeeder)
-builder.Services
-    .AddIdentityCore<ApplicationUser>()
+builder.Services.AddIdentityCore<ApplicationUser>(o =>
+{
+    o.User.RequireUniqueEmail = true;
+    o.Password.RequiredLength = 8;
+    o.Password.RequireDigit = true;
+    o.Password.RequireNonAlphanumeric = true;
+    o.Password.RequireUppercase = true;
+    o.Password.RequireLowercase = true;
+    o.Lockout.MaxFailedAccessAttempts = 5;
+})
     .AddRoles<IdentityRole<Guid>>()
-    .AddEntityFrameworkStores<Library.Api.Data.LibraryDbContext>();
+    .AddEntityFrameworkStores<LibraryDbContext>()
+    .AddSignInManager();
 
 var app = builder.Build();
 // Log on successful startup to evidence options validation passed
