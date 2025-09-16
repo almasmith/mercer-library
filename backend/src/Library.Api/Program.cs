@@ -185,6 +185,9 @@ builder.Services.AddIdentityCore<ApplicationUser>(o =>
 // Register JWT token service
 builder.Services.AddScoped<Library.Api.Services.IJwtTokenService, Library.Api.Services.JwtTokenService>();
 
+// Register Book service
+builder.Services.AddScoped<Library.Api.Services.IBookService, Library.Api.Services.BookService>();
+
 // Health checks: liveness and readiness (DB)
 builder.Services.AddHealthChecks()
     .AddDbContextCheck<LibraryDbContext>("db", tags: new[] { "ready" });
