@@ -13,6 +13,7 @@ import type {
   CreateBookInput,
   UpdateBookInput,
 } from "@/features/books/types/book";
+import type { PagedBooks } from "@/features/books/types/book";
 
 export const booksKeys = {
   all: ["books"] as const,
@@ -22,11 +23,10 @@ export const booksKeys = {
 };
 
 export function useBooks(params: ListParams) {
-  return useQuery({
+  return useQuery<PagedBooks>({
     queryKey: booksKeys.list(params),
     queryFn: () => listBooks(params),
     staleTime: 30_000,
-    keepPreviousData: true,
   });
 }
 

@@ -10,8 +10,7 @@ const trimNonEmpty = (max: number) =>
   z
     .string()
     .transform(s => s.trim())
-    .refine(s => s.length > 0, "Required")
-    .max(max);
+    .pipe(z.string().min(1, "Required").max(max));
 
 export const isoDateSchema = z
   .string()
