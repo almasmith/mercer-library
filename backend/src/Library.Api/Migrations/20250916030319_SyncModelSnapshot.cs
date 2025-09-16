@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Library.Api.Migrations
 {
     /// <inheritdoc />
-    public partial class AddUserStatsVersion : Migration
+    public partial class SyncModelSnapshot : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -34,5 +34,3 @@ namespace Library.Api.Migrations
         }
     }
 }
-
-
