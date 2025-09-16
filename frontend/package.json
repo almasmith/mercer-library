@@ -10,8 +10,17 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.2.2",
+    "@microsoft/signalr": "^9.0.6",
+    "@radix-ui/react-slot": "^1.2.3",
+    "@tanstack/react-query": "^5.89.0",
+    "clsx": "^2.1.1",
     "react": "^19.1.1",
-    "react-dom": "^19.1.1"
+    "react-dom": "^19.1.1",
+    "react-hook-form": "^7.62.0",
+    "react-router-dom": "^7.9.1",
+    "recharts": "^3.2.1",
+    "zod": "^4.1.8"
   },
   "devDependencies": {
     "@eslint/js": "^9.33.0",
