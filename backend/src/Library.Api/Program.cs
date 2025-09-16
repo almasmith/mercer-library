@@ -51,6 +51,9 @@ builder.Services.AddSwaggerGen(c =>
 });
 builder.Services.AddSwaggerExamplesFromAssemblyOf<Program>();
 
+// AutoMapper registration
+builder.Services.AddAutoMapper(typeof(Program));
+
 // Options binding with validation and ValidateOnStart
 builder.Services
     .AddOptions<Library.Api.Configuration.JwtOptions>()
