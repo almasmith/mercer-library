@@ -10,6 +10,7 @@ export default function AppLayout() {
           <div className="flex items-center gap-4">
             <Link to="/" className="text-sm text-slate-600 hover:text-slate-900">Home</Link>
             <Link to="/stats" className="text-sm text-slate-600 hover:text-slate-900">Stats</Link>
+            <a href="/favorites" className="text-sm text-slate-600 hover:text-slate-900">Favorites</a>
           </div>
         </nav>
       </header>

@@ -39,9 +39,9 @@ function useListParams(): [ListParams, (next: Partial<ListParams>) => void] {
   return [current, update];
 }
 
-export function BookTable() {
+export function BookTable({ useData = useBooks }: { useData?: (p: any) => { data?: any; isLoading: boolean; isError: boolean } }) {
   const [listParams, setListParams] = useListParams();
-  const { data, isLoading, isError } = useBooks(listParams);
+  const { data, isLoading, isError } = useData(listParams);
   const del = useDeleteBook();
   const { Confirm, confirm } = useConfirm();
 
