@@ -1,12 +1,10 @@
 # Library Frontend (React + Vite + TypeScript)
 
-<!-- BEGIN:LIBRARY-FRONTEND-README -->
 A Vite React SPA for the Book Library application. It implements authentication, books CRUD with sorting/filtering/paging, favorites, stats/analytics, and realtime updates over SignalR.
 
 ## Requirements
 - Node.js 20+ and npm 10+
-- Backend API running locally (default `http://localhost:5000`)
-- Optional: Docker for full-stack orchestration
+- Backend API running locally (default `https://localhost:7186`)
 
 ## Quickstart
 ```bash
@@ -18,7 +16,7 @@ npm --prefix frontend run dev
 ## Environment variables
 Create `frontend/.env` (or `.env.local`) with:
 ```bash
-VITE_API_BASE_URL=http://localhost:5000
+VITE_API_BASE_URL=https://localhost:7186
 VITE_DEFAULT_PAGE_SIZE=20
 VITE_MAX_PAGE_SIZE=100
 ```
@@ -36,7 +34,7 @@ npm --prefix frontend run format         # Prettier write
 npm --prefix frontend run format:check   # Prettier check
 npm --prefix frontend run codegen        # (optional) OpenAPI → TS types
 ```
-If present, OpenAPI is read from `docs/openapi.json`.
+OpenAPI is read from `docs/openapi.json`.
 
 ## Project structure
 ```
@@ -73,8 +71,8 @@ frontend/
 - Lists support URL-bound filters and sort; default sort is `publishedDate desc`.
 
 ## ETag & conditional requests
-- Optional: capture ETag on GET; send `If-Match` on PUT.
-- Optional: conditional GETs with `If-None-Match` to leverage `304 Not Modified`.
+- Capture ETag on GET; send `If-Match` on PUT.
+- Conditional GETs with `If-None-Match` to leverage `304 Not Modified`.
 
 ## Realtime
 - Events: `bookCreated/updated/deleted`, `bookFavorited/unfavorited`, `bookRead`, `statsUpdated`.
@@ -96,7 +94,9 @@ frontend/
 - Build static assets and host on a static host (e.g., Vercel/Netlify).
 - Set `VITE_API_BASE_URL` to the deployed API URL.
 
-## API reference (optional)
-- If `docs/openapi.json` is present: generate types via `npm --prefix frontend run codegen`.
+## Code Generation
+- Generate types via `npm --prefix frontend run codegen`.
 
-<!-- END:LIBRARY-FRONTEND-README -->
+## Further Reading
+
+- See [docs/README.md](docs/README.md) for Architectural Decision Records (ADRs).
