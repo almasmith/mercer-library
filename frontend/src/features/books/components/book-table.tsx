@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { useBooks } from "@/features/books/hooks/use-books";
 import type { ListParams } from "@/features/books/api/books";
 import { RATING_MIN, RATING_MAX } from "@/features/books/types/book";
+import { Pagination } from "./pagination";
 
 const DEFAULT_SORT = { sortBy: "publishedDate", sortOrder: "desc" } as const;
 
@@ -121,6 +122,7 @@ export function BookTable() {
           </tbody>
         </table>
       </div>
+      <Pagination totalItems={data.totalItems} />
     </div>
   );
 }
