@@ -12,7 +12,6 @@ export function useFavorites(params: FavoritesListParams) {
     queryKey: favoritesKeys.list(params),
     queryFn: () => listFavorites(params),
     staleTime: 30_000,
-    keepPreviousData: true,
   });
 }
 

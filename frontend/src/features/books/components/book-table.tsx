@@ -118,7 +118,7 @@ export function BookTable({ useData = useBooks }: { useData?: (p: any) => { data
             </tr>
           </thead>
           <tbody>
-            {data.items.map((b) => (
+            {data.items.map((b: any) => (
               <tr key={b.id} className="border-b">
                 <td className="px-3 py-2">
                   <FavoriteToggle bookId={b.id} initialOn={false} />
@@ -135,7 +135,7 @@ export function BookTable({ useData = useBooks }: { useData?: (p: any) => { data
                     const ok = await confirm(`Delete "${b.title}"? This cannot be undone.`);
                     if (!ok) return;
                     const prev = data.items;
-                    (data.items as any) = data.items.filter((x) => x.id !== b.id);
+                    (data.items as any) = data.items.filter((x: any) => x.id !== b.id);
                     try { await del.mutateAsync(b.id); }
                     catch { (data.items as any) = prev; alert("Failed to delete"); }
                   }}>Delete</button>

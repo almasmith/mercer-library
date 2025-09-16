@@ -1,4 +1,4 @@
-import { ReactNode, useState } from "react";
+import { useState } from "react";
 
 export function useConfirm() {
   const [state, setState] = useState<{ open: boolean; message: string; resolve?: (ok: boolean) => void }>({ open: false, message: "" });
