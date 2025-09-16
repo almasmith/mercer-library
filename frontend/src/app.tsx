@@ -3,6 +3,8 @@ import AppLayout from "./app-layout";
 import HomePage from "./routes/home";
 import NotFoundPage from "./routes/not-found";
 import RequireAuth from "@/features/auth/components/require-auth";
+import LoginPage from "./routes/auth/login";
+import RegisterPage from "./routes/auth/register";
 
 export default function App() {
   return (
@@ -16,6 +18,8 @@ export default function App() {
             </RequireAuth>
           }
         />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
       </Route>
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
