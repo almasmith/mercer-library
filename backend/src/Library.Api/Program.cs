@@ -272,11 +272,14 @@ app.UseMiddleware<Library.Api.Middleware.CorrelationIdMiddleware>();
 // HTTP logging (requests/responses) - after correlation id so scope includes it
 app.UseHttpLogging();
 
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment() || app.Environment.IsStaging())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+}
 
+if (app.Environment.IsDevelopment())
+{
     // Development data seeding (idempotent)
     await DevSeeder.SeedAsync(app.Services, CancellationToken.None);
 }
