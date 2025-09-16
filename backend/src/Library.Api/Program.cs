@@ -82,6 +82,9 @@ builder.Services.AddSwaggerExamplesFromAssemblyOf<Program>();
 // AutoMapper registration
 builder.Services.AddAutoMapper(typeof(Program));
 
+// SignalR for realtime updates
+builder.Services.AddSignalR();
+
 // Options binding with validation and ValidateOnStart
 builder.Services
     .AddOptions<Library.Api.Configuration.JwtOptions>()
@@ -218,6 +221,9 @@ builder.Services.AddScoped<Library.Api.Services.Favorites.IFavoritesService, Lib
 // Register Analytics service
 builder.Services.AddScoped<Library.Api.Services.Analytics.IAnalyticsService, Library.Api.Services.Analytics.AnalyticsService>();
 
+// Realtime publisher
+builder.Services.AddScoped<Library.Api.Hubs.IRealtimePublisher, Library.Api.Hubs.RealtimePublisher>();
+
 // Health checks: liveness and readiness (DB)
 builder.Services.AddHealthChecks()
     .AddDbContextCheck<LibraryDbContext>("db", tags: new[] { "ready" });
@@ -276,5 +282,8 @@ app.MapHealthChecks("/health").AllowAnonymous();
 app.MapHealthChecks("/health/ready", new HealthCheckOptions { Predicate = r => r.Tags.Contains("ready") }).AllowAnonymous();
 
 app.MapControllers();
+
+// SignalR hub endpoint
+app.MapHub<Library.Api.Hubs.LibraryHub>("/hubs/library");
 
 app.Run();

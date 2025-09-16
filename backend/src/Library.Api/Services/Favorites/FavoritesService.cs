@@ -7,6 +7,7 @@ using Library.Api.Data;
 using Library.Api.Domain;
 using Library.Api.Dtos;
 using Library.Api.Services.Books;
+using Library.Api.Hubs;
 using Microsoft.EntityFrameworkCore;
 
 namespace Library.Api.Services.Favorites
@@ -14,10 +15,18 @@ namespace Library.Api.Services.Favorites
     public sealed class FavoritesService : IFavoritesService
     {
         private readonly LibraryDbContext _db;
+        private readonly IRealtimePublisher _publisher;
 
         public FavoritesService(LibraryDbContext db)
         {
             _db = db;
+            _publisher = null!; // optional for tests; DI uses the 2-arg ctor
+        }
+
+        public FavoritesService(LibraryDbContext db, IRealtimePublisher publisher)
+        {
+            _db = db;
+            _publisher = publisher;
         }
 
         public async Task<bool> FavoriteAsync(Guid userId, Guid bookId, CancellationToken ct)
@@ -43,12 +52,21 @@ namespace Library.Api.Services.Favorites
             {
                 _db.Favorites.Add(favorite);
                 await _db.SaveChangesAsync(ct);
+                if (_publisher != null)
+                {
+                    await _publisher.BookFavorited(userId, bookId, ct);
+                }
                 return true;
             }
             catch (DbUpdateException)
             {
                 // Likely PK conflict due to existing favorite. Ensure it exists and return true.
                 var exists = await _db.Favorites.AnyAsync(f => f.UserId == userId && f.BookId == bookId, ct);
+                if (exists && _publisher != null)
+                {
+                    // Idempotent case: still emit event to reflect current state if needed by UI
+                    await _publisher.BookFavorited(userId, bookId, ct);
+                }
                 return exists;
             }
         }
@@ -70,6 +88,10 @@ namespace Library.Api.Services.Favorites
                 .ExecuteDeleteAsync(ct);
 
             // If not found, still success (idempotent)
+            if (_publisher != null)
+            {
+                await _publisher.BookUnfavorited(userId, bookId, ct);
+            }
             return true;
         }
 

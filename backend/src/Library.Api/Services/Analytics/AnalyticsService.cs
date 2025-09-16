@@ -8,6 +8,7 @@ using Library.Api.Data;
 using Library.Api.Domain;
 using Library.Api.Dtos.Analytics;
 using Library.Api.Services.Stats;
+using Library.Api.Hubs;
 using Microsoft.EntityFrameworkCore;
 
 namespace Library.Api.Services.Analytics
@@ -16,17 +17,27 @@ namespace Library.Api.Services.Analytics
     {
         private readonly LibraryDbContext _db;
         private readonly IStatsVersionService _stats;
+        private readonly IRealtimePublisher _publisher;
 
         public AnalyticsService(LibraryDbContext db)
         {
             _db = db;
             _stats = null!; // optional for tests; DI uses the other ctor
+            _publisher = null!; // optional for tests; DI uses the 3-arg ctor
         }
 
         public AnalyticsService(LibraryDbContext db, IStatsVersionService stats)
         {
             _db = db;
             _stats = stats;
+            _publisher = null!; // optional for tests; DI uses the 3-arg ctor
+        }
+
+        public AnalyticsService(LibraryDbContext db, IStatsVersionService stats, IRealtimePublisher publisher)
+        {
+            _db = db;
+            _stats = stats;
+            _publisher = publisher;
         }
 
         public async Task RecordReadAsync(Guid userId, Guid bookId, CancellationToken ct)
@@ -54,6 +65,12 @@ namespace Library.Api.Services.Analytics
             if (_stats != null)
             {
                 await _stats.BumpAsync(userId, ct);
+            }
+
+            if (_publisher != null)
+            {
+                await _publisher.BookRead(userId, bookId, ct);
+                await _publisher.StatsUpdated(userId, ct);
             }
         }
 

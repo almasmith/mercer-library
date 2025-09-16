@@ -7,6 +7,7 @@ using Library.Api.Data;
 using Library.Api.Domain;
 using Library.Api.Dtos;
 using Library.Api.Services.Books;
+using Library.Api.Hubs;
 using Microsoft.EntityFrameworkCore;
 
 namespace Library.Api.Services
@@ -15,17 +16,27 @@ namespace Library.Api.Services
     {
         private readonly LibraryDbContext _db;
         private readonly Library.Api.Services.Stats.IStatsVersionService _stats;
+        private readonly IRealtimePublisher _publisher;
 
         public BookService(LibraryDbContext db)
         {
             _db = db;
             _stats = null!; // will be set via DI constructor overload
+            _publisher = null!; // optional for tests; DI uses the 3-arg ctor
         }
 
         public BookService(LibraryDbContext db, Library.Api.Services.Stats.IStatsVersionService stats)
         {
             _db = db;
             _stats = stats;
+            _publisher = null!; // optional for tests; DI uses the 3-arg ctor
+        }
+
+        public BookService(LibraryDbContext db, Library.Api.Services.Stats.IStatsVersionService stats, IRealtimePublisher publisher)
+        {
+            _db = db;
+            _stats = stats;
+            _publisher = publisher;
         }
 
         public async Task<Book> CreateAsync(Guid ownerUserId, Book book, CancellationToken ct)
@@ -49,6 +60,22 @@ namespace Library.Api.Services
             if (_stats != null)
             {
                 await _stats.BumpAsync(ownerUserId, ct);
+            }
+
+            // Publish events: created + statsUpdated
+            if (_publisher != null)
+            {
+                var payload = new BookDto(
+                    book.Id,
+                    book.Title,
+                    book.Author,
+                    book.Genre ?? string.Empty,
+                    book.PublishedDate,
+                    book.Rating,
+                    book.CreatedAt,
+                    book.UpdatedAt);
+                await _publisher.BookCreated(ownerUserId, payload, ct);
+                await _publisher.StatsUpdated(ownerUserId, ct);
             }
             return book;
         }
@@ -170,6 +197,20 @@ namespace Library.Api.Services
             {
                 await _stats.BumpAsync(ownerUserId, ct);
             }
+            if (_publisher != null)
+            {
+                var payload = new BookDto(
+                    book.Id,
+                    book.Title,
+                    book.Author,
+                    book.Genre ?? string.Empty,
+                    book.PublishedDate,
+                    book.Rating,
+                    book.CreatedAt,
+                    book.UpdatedAt);
+                await _publisher.BookUpdated(ownerUserId, payload, ct);
+                await _publisher.StatsUpdated(ownerUserId, ct);
+            }
             return book;
         }
 
@@ -186,6 +227,11 @@ namespace Library.Api.Services
             if (_stats != null)
             {
                 await _stats.BumpAsync(ownerUserId, ct);
+            }
+            if (_publisher != null)
+            {
+                await _publisher.BookDeleted(ownerUserId, id, ct);
+                await _publisher.StatsUpdated(ownerUserId, ct);
             }
             return true;
         }
