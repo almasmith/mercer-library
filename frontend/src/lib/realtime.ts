@@ -9,6 +9,8 @@ const subscribers = new Set<(s: RealtimeStatus) => void>();
 let tokenProvider: (() => string | undefined) | undefined;
 // Keep track of desired event handlers to attach when a connection exists
 const eventHandlers = new Map<string, Set<(...args: unknown[]) => void>>();
+// Coalesce concurrent connect attempts
+let connectPromise: Promise<HubConnection> | null = null;
 
 function notify(next: RealtimeStatus) {
   status = next;
@@ -50,30 +52,46 @@ export async function connectRealtime(): Promise<HubConnection> {
     return Promise.reject(new Error("Missing access token for realtime connection"));
   }
   if (connection) return connection;
+  if (connectPromise) return connectPromise;
 
-  notify("connecting");
-  const conn = new HubConnectionBuilder()
-    .withUrl(hubUrl(), { accessTokenFactory: () => tokenProvider?.() ?? "", withCredentials: false })
-    .withAutomaticReconnect({
-      nextRetryDelayInMilliseconds: (ctx) => Math.min(30_000, 1_000 * 2 ** ctx.previousRetryCount),
-    })
-    .configureLogging(LogLevel.Warning)
-    .build();
+  connectPromise = (async () => {
+    notify("connecting");
+    const conn = new HubConnectionBuilder()
+      .withUrl(hubUrl(), { accessTokenFactory: () => tokenProvider?.() ?? "", withCredentials: false })
+      .withAutomaticReconnect({
+        nextRetryDelayInMilliseconds: (ctx) => Math.min(30_000, 1_000 * 2 ** ctx.previousRetryCount),
+      })
+      .configureLogging(LogLevel.Warning)
+      .build();
 
-  conn.onreconnecting(() => notify("reconnecting"));
-  conn.onreconnected(() => notify("connected"));
-  conn.onclose(() => {
-    connection = null;
-    notify("disconnected");
-  });
+    conn.onreconnecting(() => notify("reconnecting"));
+    conn.onreconnected(() => {
+      attachAllHandlers(conn);
+      notify("connected");
+    });
+    conn.onclose(() => {
+      connection = null;
+      connectPromise = null;
+      notify("disconnected");
+    });
 
-  // Ensure any previously registered handlers are wired up on this connection
-  attachAllHandlers(conn);
+    // Ensure any previously registered handlers are wired up on this connection
+    attachAllHandlers(conn);
 
-  await conn.start();
-  connection = conn;
-  notify("connected");
-  return conn;
+    await conn.start();
+    connection = conn;
+    // Attach again to capture any handlers registered during start
+    attachAllHandlers(conn);
+    notify("connected");
+    return conn;
+  })();
+
+  try {
+    return await connectPromise;
+  } finally {
+    // Clear the promise once resolved/rejected, so future calls can reconnect if needed
+    connectPromise = null;
+  }
 }
 
 export async function disconnectRealtime(): Promise<void> {
