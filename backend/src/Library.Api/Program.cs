@@ -212,6 +212,9 @@ builder.Services.AddScoped<Library.Api.Services.IBookService, Library.Api.Servic
 // Register Stats version service
 builder.Services.AddScoped<Library.Api.Services.Stats.IStatsVersionService, Library.Api.Services.Stats.StatsVersionService>();
 
+// Register Favorites service
+builder.Services.AddScoped<Library.Api.Services.Favorites.IFavoritesService, Library.Api.Services.Favorites.FavoritesService>();
+
 // Health checks: liveness and readiness (DB)
 builder.Services.AddHealthChecks()
     .AddDbContextCheck<LibraryDbContext>("db", tags: new[] { "ready" });
