@@ -209,6 +209,9 @@ builder.Services.AddScoped<Library.Api.Services.IJwtTokenService, Library.Api.Se
 // Register Book service
 builder.Services.AddScoped<Library.Api.Services.IBookService, Library.Api.Services.BookService>();
 
+// Register Stats version service
+builder.Services.AddScoped<Library.Api.Services.Stats.IStatsVersionService, Library.Api.Services.Stats.StatsVersionService>();
+
 // Health checks: liveness and readiness (DB)
 builder.Services.AddHealthChecks()
     .AddDbContextCheck<LibraryDbContext>("db", tags: new[] { "ready" });

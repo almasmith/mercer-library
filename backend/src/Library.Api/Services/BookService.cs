@@ -14,10 +14,18 @@ namespace Library.Api.Services
     public sealed class BookService : IBookService
     {
         private readonly LibraryDbContext _db;
+        private readonly Library.Api.Services.Stats.IStatsVersionService _stats;
 
         public BookService(LibraryDbContext db)
         {
             _db = db;
+            _stats = null!; // will be set via DI constructor overload
+        }
+
+        public BookService(LibraryDbContext db, Library.Api.Services.Stats.IStatsVersionService stats)
+        {
+            _db = db;
+            _stats = stats;
         }
 
         public async Task<Book> CreateAsync(Guid ownerUserId, Book book, CancellationToken ct)
@@ -37,6 +45,11 @@ namespace Library.Api.Services
 
             await _db.Books.AddAsync(book, ct);
             await _db.SaveChangesAsync(ct);
+            // Bump stats for the owner
+            if (_stats != null)
+            {
+                await _stats.BumpAsync(ownerUserId, ct);
+            }
             return book;
         }
 
@@ -153,6 +166,10 @@ namespace Library.Api.Services
             book.UpdatedAt = DateTimeOffset.UtcNow;
 
             await _db.SaveChangesAsync(ct);
+            if (_stats != null)
+            {
+                await _stats.BumpAsync(ownerUserId, ct);
+            }
             return book;
         }
 
@@ -166,6 +183,10 @@ namespace Library.Api.Services
 
             _db.Books.Remove(book);
             await _db.SaveChangesAsync(ct);
+            if (_stats != null)
+            {
+                await _stats.BumpAsync(ownerUserId, ct);
+            }
             return true;
         }
     }

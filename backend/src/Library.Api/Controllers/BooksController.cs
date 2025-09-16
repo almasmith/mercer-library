@@ -29,13 +29,15 @@ public sealed class BooksController : ControllerBase
     private readonly IMapper _mapper;
     private readonly ILogger<BooksController> _logger;
     private readonly LibraryDbContext _db;
+    private readonly Library.Api.Services.Stats.IStatsVersionService _stats;
 
-    public BooksController(IBookService bookService, IMapper mapper, ILogger<BooksController> logger, LibraryDbContext db)
+    public BooksController(IBookService bookService, IMapper mapper, ILogger<BooksController> logger, LibraryDbContext db, Library.Api.Services.Stats.IStatsVersionService stats)
     {
         _bookService = bookService;
         _mapper = mapper;
         _logger = logger;
         _db = db;
+        _stats = stats;
     }
 
     [HttpGet]
@@ -150,6 +152,14 @@ public sealed class BooksController : ControllerBase
     public async Task<IActionResult> Stats(CancellationToken ct)
     {
         var ownerUserId = UserContext.GetUserId(HttpContext);
+        // Conditional GET using per-user stats version
+        var version = await _stats.GetVersionAsync(ownerUserId, ct);
+        var etag = $"\"stats:{ownerUserId}:{version}\"";
+        if (ETagHelper.IfNoneMatchSatisfied(Request, etag))
+        {
+            Response.Headers[Microsoft.Net.Http.Headers.HeaderNames.ETag] = etag;
+            return StatusCode(StatusCodes.Status304NotModified);
+        }
 
         var genres = await _db.Books
             .AsNoTracking()
@@ -172,6 +182,7 @@ public sealed class BooksController : ControllerBase
             .Select(x => new BookGenreCountDto(x.Canonical, x.Count))
             .ToList();
 
+        Response.Headers[Microsoft.Net.Http.Headers.HeaderNames.ETag] = etag;
         return Ok(results);
     }
 }
