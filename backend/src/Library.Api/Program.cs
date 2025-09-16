@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Library.Api.Domain;
 using Library.Api.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -42,6 +44,9 @@ builder.Services.AddControllers().AddJsonOptions(o =>
         return new BadRequestObjectResult(vpd) { ContentTypes = { "application/problem+json" } };
     };
 });
+// FluentValidation: automatic model validation and validator discovery
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddValidatorsFromAssemblyContaining<Library.Api.Validation.CreateBookRequestValidator>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
