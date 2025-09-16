@@ -44,6 +44,8 @@ public sealed class BooksController : ControllerBase
     [Produces(MediaTypeNames.Application.Json)]
     [SwaggerOperation(Summary = "List books", Description = "Lists books for the authenticated user with filtering, sorting, and pagination.")]
     [SwaggerResponse(StatusCodes.Status200OK, "Books listed", typeof(PagedResult<BookDto>))]
+    [ProducesResponseType(typeof(PagedResult<BookDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> List([FromQuery] BookListParameters parameters, CancellationToken ct)
     {
         var ownerUserId = UserContext.GetUserId(HttpContext);
@@ -59,6 +61,9 @@ public sealed class BooksController : ControllerBase
     [SwaggerOperation(Summary = "Get a book", Description = "Gets a book by id for the authenticated user.")]
     [SwaggerResponse(StatusCodes.Status200OK, "Book found", typeof(BookDto))]
     [SwaggerResponse(StatusCodes.Status404NotFound, "Book not found")]
+    [ProducesResponseType(typeof(BookDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> GetById([FromRoute] Guid id, CancellationToken ct)
     {
         var ownerUserId = UserContext.GetUserId(HttpContext);
@@ -84,9 +89,11 @@ public sealed class BooksController : ControllerBase
     [HttpPost]
     [Consumes(MediaTypeNames.Application.Json)]
     [Produces(MediaTypeNames.Application.Json)]
-    [ProducesResponseType(typeof(BookDto), StatusCodes.Status201Created)]
     [SwaggerOperation(Summary = "Create a book", Description = "Creates a new book for the authenticated user.")]
     [SwaggerResponse(StatusCodes.Status400BadRequest, "Validation errors", typeof(ValidationProblemDetails))]
+    [ProducesResponseType(typeof(BookDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Create([FromBody] CreateBookRequest request, CancellationToken ct)
     {
         var ownerUserId = UserContext.GetUserId(HttpContext);
@@ -106,6 +113,10 @@ public sealed class BooksController : ControllerBase
     [SwaggerResponse(StatusCodes.Status200OK, "Book updated", typeof(BookDto))]
     [SwaggerResponse(StatusCodes.Status400BadRequest, "Validation errors", typeof(ValidationProblemDetails))]
     [SwaggerResponse(StatusCodes.Status404NotFound, "Book not found")]
+    [ProducesResponseType(typeof(BookDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateBookRequest request, CancellationToken ct)
     {
         var ownerUserId = UserContext.GetUserId(HttpContext);
@@ -133,6 +144,9 @@ public sealed class BooksController : ControllerBase
     [SwaggerOperation(Summary = "Delete a book", Description = "Deletes a book by id for the authenticated user.")]
     [SwaggerResponse(StatusCodes.Status204NoContent, "Book deleted")]
     [SwaggerResponse(StatusCodes.Status404NotFound, "Book not found")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Delete([FromRoute] Guid id, CancellationToken ct)
     {
         var ownerUserId = UserContext.GetUserId(HttpContext);
@@ -149,6 +163,8 @@ public sealed class BooksController : ControllerBase
     [Produces(MediaTypeNames.Application.Json)]
     [SwaggerOperation(Summary = "Book stats by genre", Description = "Returns genre counts for the authenticated user. Excludes empty/null genres. Case-insensitive grouping with whitespace trimming.")]
     [SwaggerResponse(StatusCodes.Status200OK, "Stats calculated", typeof(IEnumerable<BookGenreCountDto>))]
+    [ProducesResponseType(typeof(IEnumerable<BookGenreCountDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Stats(CancellationToken ct)
     {
         var ownerUserId = UserContext.GetUserId(HttpContext);

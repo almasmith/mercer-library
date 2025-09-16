@@ -56,10 +56,11 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.EnableAnnotations();
     c.ExampleFilters();
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Library API", Version = "v1" });
     // JWT Bearer security definition for Swagger UI "Authorize" button
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        Description = "JWT Authorization header using the Bearer scheme. Enter only the token value.",
+        Description = "Enter: Bearer {your JWT token}",
         Name = "Authorization",
         In = ParameterLocation.Header,
         Type = SecuritySchemeType.Http,
@@ -73,7 +74,7 @@ builder.Services.AddSwaggerGen(c =>
             {
                 Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
             },
-            new string[] { }
+            Array.Empty<string>()
         }
     });
 });

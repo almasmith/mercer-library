@@ -45,6 +45,8 @@ public sealed class AuthController : ControllerBase
     [SwaggerResponseExample(StatusCodes.Status200OK, typeof(AuthResponseExample))]
     [SwaggerResponse(StatusCodes.Status400BadRequest, "Validation errors", typeof(ValidationProblemDetails))]
     [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(RegisterValidationProblemExample))]
+    [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request, CancellationToken ct)
     {
         if (!ModelState.IsValid)
@@ -92,6 +94,9 @@ public sealed class AuthController : ControllerBase
     [SwaggerResponseExample(StatusCodes.Status200OK, typeof(AuthResponseExample))]
     [SwaggerResponse(StatusCodes.Status400BadRequest, "Validation errors", typeof(ValidationProblemDetails))]
     [SwaggerResponse(StatusCodes.Status401Unauthorized, "Invalid credentials", typeof(ProblemDetails))]
+    [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Login([FromBody] LoginRequest request, CancellationToken ct)
     {
         if (!ModelState.IsValid)

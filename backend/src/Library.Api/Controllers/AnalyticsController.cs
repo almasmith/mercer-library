@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
+using Swashbuckle.AspNetCore.Filters;
 
 namespace Library.Api.Controllers;
 
@@ -30,6 +31,9 @@ public sealed class AnalyticsController : ControllerBase
     [SwaggerOperation(Summary = "Record a book read event", Description = "Records a read event for the specified book owned by the authenticated user.")]
     [SwaggerResponse(StatusCodes.Status204NoContent, "Read recorded")] 
     [SwaggerResponse(StatusCodes.Status404NotFound, "Book not found or not owned")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> RecordRead([FromRoute] Guid id, CancellationToken ct)
     {
         var userId = UserContext.GetUserId(HttpContext);
@@ -43,6 +47,10 @@ public sealed class AnalyticsController : ControllerBase
     [SwaggerOperation(Summary = "Average rating by month", Description = "Returns average book rating grouped by month within the optional date range.")]
     [SwaggerResponse(StatusCodes.Status200OK, "Averages calculated", typeof(IReadOnlyList<AvgRatingBucketDto>))]
     [SwaggerResponse(StatusCodes.Status400BadRequest, "Validation errors", typeof(ValidationProblemDetails))]
+    [SwaggerResponseExample(StatusCodes.Status200OK, typeof(AvgRatingResponseExample))]
+    [ProducesResponseType(typeof(IReadOnlyList<AvgRatingBucketDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> GetAvgRatingByMonth(
         [FromQuery(Name = "bucket")] string? bucket,
         [FromQuery(Name = "from")] DateTimeOffset? from,
@@ -73,6 +81,10 @@ public sealed class AnalyticsController : ControllerBase
     [SwaggerOperation(Summary = "Most read genres", Description = "Returns most read genres sorted by read count descending, then genre ascending (case-insensitive).")]
     [SwaggerResponse(StatusCodes.Status200OK, "Genres calculated", typeof(IReadOnlyList<MostReadGenreDto>))]
     [SwaggerResponse(StatusCodes.Status400BadRequest, "Validation errors", typeof(ValidationProblemDetails))]
+    [SwaggerResponseExample(StatusCodes.Status200OK, typeof(MostReadGenresResponseExample))]
+    [ProducesResponseType(typeof(IReadOnlyList<MostReadGenreDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> GetMostReadGenres(
         [FromQuery(Name = "from")] DateTimeOffset? from,
         [FromQuery(Name = "to")] DateTimeOffset? to,
