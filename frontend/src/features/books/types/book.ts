@@ -14,7 +14,7 @@ const trimNonEmpty = (max: number) =>
 
 export const isoDateSchema = z
   .string()
-  .regex(/^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}Z)?$/, "Invalid date")
+  .regex(/^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d{1,7})?Z)?$/, "Invalid date")
   .transform(s => (s.length === 10 ? `${s}T00:00:00Z` : s));
 
 export const bookSchema = z.object({

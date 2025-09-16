@@ -1,6 +1,9 @@
 import { useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useBooks } from "@/features/books/hooks/use-books";
+import { useDeleteBook } from "@/features/books/hooks/use-books";
+import { useConfirm } from "@/components/confirm-dialog";
 import type { ListParams } from "@/features/books/api/books";
 import { RATING_MIN, RATING_MAX } from "@/features/books/types/book";
 import { Pagination } from "./pagination";
@@ -38,6 +41,8 @@ function useListParams(): [ListParams, (next: Partial<ListParams>) => void] {
 export function BookTable() {
   const [listParams, setListParams] = useListParams();
   const { data, isLoading, isError } = useBooks(listParams);
+  const del = useDeleteBook();
+  const { Confirm, confirm } = useConfirm();
 
   const toggleSort = (key: NonNullable<ListParams["sortBy"]>) => {
     const { sortBy, sortOrder } = listParams;
@@ -53,6 +58,7 @@ export function BookTable() {
 
   return (
     <div className="space-y-3">
+      <Confirm />
       <div className="flex flex-wrap items-end gap-2">
         <div>
           <label className="block text-sm">Search</label>
@@ -106,6 +112,7 @@ export function BookTable() {
                   {listParams.sortBy === col ? (listParams.sortOrder === "asc" ? " ▲" : " ▼") : null}
                 </th>
               ))}
+              <th className="border-b px-3 py-2">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -117,6 +124,17 @@ export function BookTable() {
                 <td className="px-3 py-2">{new Date(b.publishedDate).toISOString().slice(0,10)}</td>
                 <td className="px-3 py-2">{b.rating}</td>
                 <td className="px-3 py-2">{new Date(b.createdAt).toLocaleString()}</td>
+                <td className="px-3 py-2">
+                  <Link to={`/books/${b.id}/edit`} className="mr-2 underline">Edit</Link>
+                  <button className="text-red-700 underline" onClick={async () => {
+                    const ok = await confirm(`Delete "${b.title}"? This cannot be undone.`);
+                    if (!ok) return;
+                    const prev = data.items;
+                    (data.items as any) = data.items.filter((x) => x.id !== b.id);
+                    try { await del.mutateAsync(b.id); }
+                    catch { (data.items as any) = prev; alert("Failed to delete"); }
+                  }}>Delete</button>
+                </td>
               </tr>
             ))}
           </tbody>
