@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { onEvent, connectRealtime } from "@/lib/realtime";
+import { onEvent } from "@/lib/realtime";
 import { useQueryClient } from "@tanstack/react-query";
 import { booksKeys } from "@/features/books/hooks/use-books";
 
@@ -20,11 +20,6 @@ export function useRealtime() {
   const qc = useQueryClient();
 
   useEffect(() => {
-    // Ensure connection (no-op if already connected)
-    connectRealtime().catch(() => {
-      /* connection handled by F29 lifecycle */
-    });
-
     const unsubs: Array<() => void> = [];
 
     // Books CRUD
