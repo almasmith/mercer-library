@@ -94,6 +94,7 @@ namespace Library.Api.Services
                 .Where(b => b.OwnerUserId == ownerUserId);
 
             // Filters
+            var usingSqlite = _db.Database.IsSqlite();
             if (!string.IsNullOrWhiteSpace(p.Genre))
             {
                 var genre = p.Genre.Trim();
@@ -110,12 +111,12 @@ namespace Library.Api.Services
                 query = query.Where(b => b.Rating <= p.MaxRating.Value);
             }
 
-            if (p.PublishedFrom.HasValue)
+            if (p.PublishedFrom.HasValue && !usingSqlite)
             {
                 query = query.Where(b => b.PublishedDate >= p.PublishedFrom.Value);
             }
 
-            if (p.PublishedTo.HasValue)
+            if (p.PublishedTo.HasValue && !usingSqlite)
             {
                 query = query.Where(b => b.PublishedDate <= p.PublishedTo.Value);
             }
@@ -148,17 +149,28 @@ namespace Library.Api.Services
             var page = p.Page < 1 ? 1 : p.Page;
             var pageSize = p.PageSize < 1 ? 1 : p.PageSize > 100 ? 100 : p.PageSize;
 
-            // SQLite does not support ORDER BY DateTimeOffset. Fallback to in-memory ordering for date sorts on SQLite.
+            // SQLite does not support ORDER BY or filtering with DateTimeOffset. Fallback to in-memory for date sorts/filters on SQLite.
             var isDateSort = string.IsNullOrEmpty(sortBy) || sortBy == "createdat" || sortBy == "publisheddate";
-            if (isDateSort && _db.Database.IsSqlite())
+            var hasDateFilter = p.PublishedFrom.HasValue || p.PublishedTo.HasValue;
+            if ((isDateSort || hasDateFilter) && usingSqlite)
             {
-                var totalItems = await query.LongCountAsync(ct);
+                var allItems = await query.ToListAsync(ct);
+                // Apply date filters client-side when using SQLite
+                if (p.PublishedFrom.HasValue)
+                {
+                    allItems = allItems.Where(b => b.PublishedDate >= p.PublishedFrom.Value).ToList();
+                }
+                if (p.PublishedTo.HasValue)
+                {
+                    allItems = allItems.Where(b => b.PublishedDate <= p.PublishedTo.Value).ToList();
+                }
+
+                var totalItems = (long)allItems.Count;
                 var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
 
-                var allItems = await query.ToListAsync(ct);
-                Func<Book, DateTimeOffset> dateSelector = sortBy == "createdat" ? b => b.CreatedAt : b => b.PublishedDate;
-                var ordered = descending ? allItems.OrderByDescending(dateSelector) : allItems.OrderBy(dateSelector);
-                var items = ordered
+                var itemsQueryable = allItems.AsQueryable();
+                itemsQueryable = descending ? itemsQueryable.OrderByDescending(orderBy) : itemsQueryable.OrderBy(orderBy);
+                var items = itemsQueryable
                     .Skip((page - 1) * pageSize)
                     .Take(pageSize)
                     .ToList();
