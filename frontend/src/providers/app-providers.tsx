@@ -5,6 +5,7 @@ import { AuthProvider } from "@/features/auth/hooks/use-auth";
 import { queryClient } from "../lib/query-client";
 import { ThemeProvider } from "./theme-provider";
 import { ToastProvider } from "./toast-provider";
+import { RealtimeSubscriptions } from "@/features/realtime/realtime-subscriptions";
 
 export function AppProviders({ children }: { children: ReactNode }) {
   return (
@@ -12,7 +13,10 @@ export function AppProviders({ children }: { children: ReactNode }) {
       <ThemeProvider>
         <ToastProvider>
           <AuthProvider>
-            <BrowserRouter>{children}</BrowserRouter>
+            <BrowserRouter>
+              <RealtimeSubscriptions />
+              {children}
+            </BrowserRouter>
           </AuthProvider>
         </ToastProvider>
       </ThemeProvider>
