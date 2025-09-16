@@ -13,7 +13,3 @@ The server emits CRUD and analytics-related events. The client should reflect ch
 ## Consequences
 - Fresh UI with minimal manual refresh.
 - Bounded refetching via targeted invalidations.
-
-## Alternatives considered
-- Push full payloads for each event (heavier server/client coupling).
-EOF,

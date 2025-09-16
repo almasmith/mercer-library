@@ -13,7 +13,3 @@ Books resources and stats may provide ETags. The client can attach `If-Match` on
 ## Consequences
 - Lower bandwidth and flicker for stable resources.
 - Extra complexity to manage ETag keys.
-
-## Alternatives considered
-- Last-write-wins only (simpler but risks lost updates).
-EOF,

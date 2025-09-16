@@ -15,8 +15,3 @@ The API standardizes errors as RFC 7807 ProblemDetails. The client must surface 
 - Predictable error UX across features.
 - Easier diagnostics via correlation IDs.
 - Slight overhead to parse JSON and maintain shapes.
-
-## Alternatives considered
-- Per-feature error shapes (rejected for inconsistency).
-- Silent failures (rejected).
-EOF,

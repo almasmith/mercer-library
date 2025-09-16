@@ -13,7 +13,3 @@ The SPA uses bearer tokens (no cookies). Tokens should live in memory to reduce 
 ## Consequences
 - Safe default (in-memory) with reload persistence.
 - Clear redirect semantics for 401 and deep links.
-
-## Alternatives considered
-- HttpOnly cookies + BFF (out of scope for this project).
-EOF,
