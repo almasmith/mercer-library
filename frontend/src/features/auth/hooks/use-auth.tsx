@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { setAccessTokenProvider } from "@/lib/http";
+import { connectRealtime, disconnectRealtime, setRealtimeAccessTokenProvider } from "@/lib/realtime";
 import type { AuthResponse } from "../types/auth";
 
 type AuthState = {
@@ -75,6 +76,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener("auth:unauthorized", onUnauthorized as EventListener);
   }, [logout]);
 
+  // Realtime lifecycle: bridge token and connect/disconnect on changes
+  useEffect(() => {
+    setRealtimeAccessTokenProvider(() => state.accessToken);
+    if (state.accessToken) {
+      connectRealtime().catch(() => { /* ignore; will retry via reconnect */ });
+    } else {
+      void disconnectRealtime();
+    }
+  }, [state.accessToken]);
+
   const value = useMemo(
     () => ({ ...state, isAuthenticated, setAuth, logout }),
     [state, isAuthenticated, setAuth, logout],
@@ -82,6 +93,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Bridge the access token to the HTTP layer (idempotent assignment).
   setAccessTokenProvider(() => state.accessToken);
+  setRealtimeAccessTokenProvider(() => state.accessToken);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
