@@ -1,4 +1,5 @@
 import { Link, Outlet } from "react-router-dom";
+import { AppErrorBoundary } from "./components/app-error-boundary";
 
 export default function AppLayout() {
   return (
@@ -12,7 +13,9 @@ export default function AppLayout() {
         </nav>
       </header>
       <main className="mx-auto max-w-5xl px-4 py-6">
-        <Outlet />
+        <AppErrorBoundary>
+          <Outlet />
+        </AppErrorBoundary>
       </main>
     </div>
   );

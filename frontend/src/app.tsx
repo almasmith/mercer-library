@@ -1,6 +1,7 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import AppLayout from "./app-layout";
 import HomePage from "./routes/home";
+import NotFoundPage from "./routes/not-found";
 
 export default function App() {
   return (
@@ -8,7 +9,7 @@ export default function App() {
       <Route path="/" element={<AppLayout />}>
         <Route index element={<HomePage />} />
       </Route>
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 }
