@@ -215,6 +215,9 @@ builder.Services.AddScoped<Library.Api.Services.Stats.IStatsVersionService, Libr
 // Register Favorites service
 builder.Services.AddScoped<Library.Api.Services.Favorites.IFavoritesService, Library.Api.Services.Favorites.FavoritesService>();
 
+// Register Analytics service
+builder.Services.AddScoped<Library.Api.Services.Analytics.IAnalyticsService, Library.Api.Services.Analytics.AnalyticsService>();
+
 // Health checks: liveness and readiness (DB)
 builder.Services.AddHealthChecks()
     .AddDbContextCheck<LibraryDbContext>("db", tags: new[] { "ready" });
