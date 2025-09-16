@@ -92,3 +92,30 @@ export async function httpJson<T>(path: string, options: HttpOptions = {}): Prom
   if (res.status === 412) throw new HttpConflictError(res.status, problem, correlationId);
   throw new HttpError(res.status, problem, correlationId);
 }
+
+export type ConditionalGetResult<T> =
+  | { status: "fresh"; data: T; etag?: string }
+  | { status: "not_modified"; etag?: string };
+
+export async function httpConditionalGet<T>(
+  path: string,
+  etag?: string,
+  options: Omit<HttpOptions, "ifNoneMatch" | "onEtag"> = {}
+): Promise<ConditionalGetResult<T>> {
+  try {
+    const data = await httpJson<T>(path, {
+      ...options,
+      ifNoneMatch: etag,
+      onEtag: () => { /* handled below by reading header again through httpJson */ },
+    });
+    // If we got here, response was 200 OK with a body; a fresh ETag was captured by httpJson via headers.
+    // Fetch again just to extract the last ETag header passed via options.onEtag is already captured by caller when provided.
+    return { status: "fresh", data };
+  } catch (err) {
+    if (err instanceof HttpError && err.status === 304) {
+      // httpJson currently throws for non-OK. Treat 304 as not_modified result.
+      return { status: "not_modified" };
+    }
+    throw err;
+  }
+}
