@@ -1,5 +1,6 @@
 import { Link, Outlet } from "react-router-dom";
 import { AppErrorBoundary } from "./components/app-error-boundary";
+import { RealtimeBadge } from "@/features/realtime/realtime-badge";
 
 export default function AppLayout() {
   return (
@@ -12,6 +13,7 @@ export default function AppLayout() {
             <Link to="/stats" className="text-sm text-slate-600 hover:text-slate-900">Stats</Link>
             <a href="/favorites" className="text-sm text-slate-600 hover:text-slate-900">Favorites</a>
             <a href="/analytics" className="text-sm text-slate-600 hover:text-slate-900">Analytics</a>
+            <RealtimeBadge />
           </div>
         </nav>
       </header>
