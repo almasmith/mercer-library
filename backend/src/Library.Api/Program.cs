@@ -28,6 +28,8 @@ builder.Services.AddControllers().AddJsonOptions(o =>
 {
     o.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
     o.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+    // B52: Accept YYYY-MM-DD for DateTimeOffset by placing this converter before the UTC converter
+    o.JsonSerializerOptions.Converters.Add(new Library.Api.Serialization.DateOnlyStringToDateTimeOffsetConverter());
     o.JsonSerializerOptions.Converters.Add(new Library.Api.Serialization.DateTimeOffsetUtcJsonConverter());
 })
 .ConfigureApiBehaviorOptions(o =>
