@@ -9,6 +9,7 @@ import LoginPage from "./routes/auth/login";
 import RegisterPage from "./routes/auth/register";
 import StatsPage from "./routes/stats";
 import FavoritesPage from "./routes/favorites";
+import AnalyticsPage from "./routes/analytics";
 
 export default function App() {
   return (
@@ -45,6 +46,14 @@ export default function App() {
           element={
             <RequireAuth>
               <StatsPage />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/analytics"
+          element={
+            <RequireAuth>
+              <AnalyticsPage />
             </RequireAuth>
           }
         />

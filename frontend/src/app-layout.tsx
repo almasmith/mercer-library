@@ -11,6 +11,7 @@ export default function AppLayout() {
             <Link to="/" className="text-sm text-slate-600 hover:text-slate-900">Home</Link>
             <Link to="/stats" className="text-sm text-slate-600 hover:text-slate-900">Stats</Link>
             <a href="/favorites" className="text-sm text-slate-600 hover:text-slate-900">Favorites</a>
+            <a href="/analytics" className="text-sm text-slate-600 hover:text-slate-900">Analytics</a>
           </div>
         </nav>
       </header>
