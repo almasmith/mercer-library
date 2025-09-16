@@ -7,6 +7,7 @@ import NotFoundPage from "./routes/not-found";
 import RequireAuth from "@/features/auth/components/require-auth";
 import LoginPage from "./routes/auth/login";
 import RegisterPage from "./routes/auth/register";
+import StatsPage from "./routes/stats";
 
 export default function App() {
   return (
@@ -38,6 +39,14 @@ export default function App() {
             }
           />
         </Route>
+        <Route
+          path="/stats"
+          element={
+            <RequireAuth>
+              <StatsPage />
+            </RequireAuth>
+          }
+        />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
       </Route>

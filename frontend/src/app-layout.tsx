@@ -9,6 +9,7 @@ export default function AppLayout() {
           <Link to="/" className="font-semibold">Library</Link>
           <div className="flex items-center gap-4">
             <Link to="/" className="text-sm text-slate-600 hover:text-slate-900">Home</Link>
+            <Link to="/stats" className="text-sm text-slate-600 hover:text-slate-900">Stats</Link>
           </div>
         </nav>
       </header>
