@@ -7,6 +7,7 @@ import { useConfirm } from "@/components/confirm-dialog";
 import type { ListParams } from "@/features/books/api/books";
 import { RATING_MIN, RATING_MAX } from "@/features/books/types/book";
 import { Pagination } from "./pagination";
+import { FavoriteToggle } from "@/features/favorites/components/favorite-toggle";
 
 const DEFAULT_SORT = { sortBy: "publishedDate", sortOrder: "desc" } as const;
 
@@ -106,6 +107,7 @@ export function BookTable() {
         <table className="min-w-full border text-left text-sm">
           <thead className="bg-slate-50">
             <tr>
+              <th className="border-b px-3 py-2" aria-label="Favorite" />
               {["title","author","genre","publishedDate","rating","createdAt"].map((col) => (
                 <th key={col} className="cursor-pointer border-b px-3 py-2" onClick={() => toggleSort(col as any)}>
                   {col}
@@ -118,6 +120,9 @@ export function BookTable() {
           <tbody>
             {data.items.map((b) => (
               <tr key={b.id} className="border-b">
+                <td className="px-3 py-2">
+                  <FavoriteToggle bookId={b.id} initialOn={false} />
+                </td>
                 <td className="px-3 py-2">{b.title}</td>
                 <td className="px-3 py-2">{b.author}</td>
                 <td className="px-3 py-2">{b.genre}</td>
