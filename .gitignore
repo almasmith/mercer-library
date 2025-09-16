@@ -47,6 +47,7 @@ node_modules/
 .turbo/
 out/
 dist/
+frontend/.vite/
 build/
 .vercel/
 coverage/
