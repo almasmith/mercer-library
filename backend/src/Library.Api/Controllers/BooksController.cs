@@ -121,6 +121,22 @@ public sealed class BooksController : ControllerBase
     {
         var ownerUserId = UserContext.GetUserId(HttpContext);
 
+        // Load current for conditional requests and existence check
+        var current = await _bookService.GetByIdAsync(ownerUserId, id, ct);
+        if (current is null)
+        {
+            return NotFound();
+        }
+
+        var currentEtag = ETagHelper.ToStrongEtag(current.RowVersion);
+
+        // Enforce relaxed concurrency: If-Match is optional; when present and stale -> 412
+        if (ETagHelper.HasIfMatch(Request) && !ETagHelper.IfMatchSatisfied(Request, currentEtag))
+        {
+            Response.Headers[Microsoft.Net.Http.Headers.HeaderNames.ETag] = currentEtag;
+            return StatusCode(StatusCodes.Status412PreconditionFailed);
+        }
+
         var updated = await _bookService.UpdateAsync(ownerUserId, id, b =>
         {
             b.Title = request.Title;
@@ -135,6 +151,9 @@ public sealed class BooksController : ControllerBase
         {
             return NotFound();
         }
+
+        var updatedEtag = ETagHelper.ToStrongEtag(updated.RowVersion);
+        Response.Headers[Microsoft.Net.Http.Headers.HeaderNames.ETag] = updatedEtag;
 
         var dto = _mapper.Map<BookDto>(updated);
         return Ok(dto);

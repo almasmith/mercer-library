@@ -51,8 +51,8 @@ namespace Library.Api.Services
             book.OwnerUserId = ownerUserId;
             book.CreatedAt = utcNow;
             book.UpdatedAt = utcNow;
-
-            // RowVersion is a concurrency token handled in other tasks; keep as-is here
+            // Initialize RowVersion to a random value to serve as an ETag across providers
+            book.RowVersion = Guid.NewGuid().ToByteArray();
 
             await _db.Books.AddAsync(book, ct);
             await _db.SaveChangesAsync(ct);
@@ -203,6 +203,8 @@ namespace Library.Api.Services
 
             applyUpdates(book);
             book.UpdatedAt = DateTimeOffset.UtcNow;
+            // Bump RowVersion to indicate a new representation (strong ETag)
+            book.RowVersion = Guid.NewGuid().ToByteArray();
 
             await _db.SaveChangesAsync(ct);
             if (_stats != null)
