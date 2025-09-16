@@ -8,7 +8,7 @@ public sealed class RegisterRequestExample : IExamplesProvider<RegisterRequest>
 {
     public RegisterRequest GetExamples() => new RegisterRequest
     {
-        Email = "user@example.com",
+        Email = "test@example.com",
         Password = "Passw0rd!"
     };
 }
@@ -17,7 +17,7 @@ public sealed class LoginRequestExample : IExamplesProvider<LoginRequest>
 {
     public LoginRequest GetExamples() => new LoginRequest
     {
-        Email = "user@example.com",
+        Email = "test@example.com",
         Password = "Passw0rd!"
     };
 }

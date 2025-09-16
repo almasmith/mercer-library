@@ -104,21 +104,41 @@ namespace Library.Api.Services
                 _ => b => b.PublishedDate
             };
 
-            query = descending ? query.OrderByDescending(orderBy) : query.OrderBy(orderBy);
-
-            // Paging
+            // Paging inputs
             var page = p.Page < 1 ? 1 : p.Page;
             var pageSize = p.PageSize < 1 ? 1 : p.PageSize > 100 ? 100 : p.PageSize;
 
-            var totalItems = await query.LongCountAsync(ct);
-            var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+            // SQLite does not support ORDER BY DateTimeOffset. Fallback to in-memory ordering for date sorts on SQLite.
+            var isDateSort = string.IsNullOrEmpty(sortBy) || sortBy == "createdat" || sortBy == "publisheddate";
+            if (isDateSort && _db.Database.IsSqlite())
+            {
+                var totalItems = await query.LongCountAsync(ct);
+                var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
 
-            var items = await query
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync(ct);
+                var allItems = await query.ToListAsync(ct);
+                Func<Book, DateTimeOffset> dateSelector = sortBy == "createdat" ? b => b.CreatedAt : b => b.PublishedDate;
+                var ordered = descending ? allItems.OrderByDescending(dateSelector) : allItems.OrderBy(dateSelector);
+                var items = ordered
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToList();
 
-            return new PagedResult<Book>(items, page, pageSize, totalItems, totalPages);
+                return new PagedResult<Book>(items, page, pageSize, totalItems, totalPages);
+            }
+            else
+            {
+                query = descending ? query.OrderByDescending(orderBy) : query.OrderBy(orderBy);
+
+                var totalItems = await query.LongCountAsync(ct);
+                var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+                var items = await query
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToListAsync(ct);
+
+                return new PagedResult<Book>(items, page, pageSize, totalItems, totalPages);
+            }
         }
 
         public async Task<Book?> UpdateAsync(Guid ownerUserId, Guid id, Action<Book> applyUpdates, CancellationToken ct)
