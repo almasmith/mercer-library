@@ -304,3 +304,5 @@ app.MapControllers();
 app.MapHub<Library.Api.Hubs.LibraryHub>("/hubs/library");
 
 app.Run();
+
+public partial class Program { }
