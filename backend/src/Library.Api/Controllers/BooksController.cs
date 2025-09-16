@@ -66,6 +66,15 @@ public sealed class BooksController : ControllerBase
             return NotFound();
         }
 
+        var etag = ETagHelper.ToStrongEtag(book.RowVersion);
+
+        if (ETagHelper.IfNoneMatchSatisfied(Request, etag))
+        {
+            Response.Headers[Microsoft.Net.Http.Headers.HeaderNames.ETag] = etag;
+            return StatusCode(StatusCodes.Status304NotModified);
+        }
+
+        Response.Headers[Microsoft.Net.Http.Headers.HeaderNames.ETag] = etag;
         var dto = _mapper.Map<BookDto>(book);
         return Ok(dto);
     }
