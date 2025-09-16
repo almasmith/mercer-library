@@ -1,4 +1,5 @@
 using Library.Api.Domain;
+using Library.Api.Dtos.Analytics;
 using Swashbuckle.AspNetCore.Filters;
 using Microsoft.AspNetCore.Mvc;
 
@@ -44,6 +45,26 @@ public sealed class RegisterValidationProblemExample : IExamplesProvider<Validat
         details.Errors.Add("email", new[] { "A user with that email already exists." });
         return details;
     }
+}
+
+
+public sealed class AvgRatingResponseExample : IExamplesProvider<IReadOnlyList<AvgRatingBucketDto>>
+{
+    public IReadOnlyList<AvgRatingBucketDto> GetExamples() => new List<AvgRatingBucketDto>
+    {
+        new AvgRatingBucketDto("2025-08", 4.25),
+        new AvgRatingBucketDto("2025-09", 3.8)
+    };
+}
+
+public sealed class MostReadGenresResponseExample : IExamplesProvider<IReadOnlyList<MostReadGenreDto>>
+{
+    public IReadOnlyList<MostReadGenreDto> GetExamples() => new List<MostReadGenreDto>
+    {
+        new MostReadGenreDto("Fantasy", 12),
+        new MostReadGenreDto("Mystery", 12),
+        new MostReadGenreDto("Classics", 5)
+    };
 }
 
 
