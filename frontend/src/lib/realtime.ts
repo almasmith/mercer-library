@@ -43,7 +43,7 @@ export async function connectRealtime(): Promise<HubConnection> {
 
   notify("connecting");
   const conn = new HubConnectionBuilder()
-    .withUrl(hubUrl(), { accessTokenFactory: () => tokenProvider?.() ?? "" })
+    .withUrl(hubUrl(), { accessTokenFactory: () => tokenProvider?.() ?? "", withCredentials: false })
     .withAutomaticReconnect({
       nextRetryDelayInMilliseconds: (ctx) => Math.min(30_000, 1_000 * 2 ** ctx.previousRetryCount),
     })

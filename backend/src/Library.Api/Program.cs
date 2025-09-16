@@ -151,8 +151,9 @@ builder.Services.AddCors(options =>
         policy
             .WithOrigins(allowedOriginsArray)
             .WithMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-            .WithHeaders("Authorization", "Content-Type", "If-Match", "If-None-Match", "X-Correlation-ID")
-            .WithExposedHeaders("ETag", "X-Correlation-ID"));
+            .AllowAnyHeader()
+            .WithExposedHeaders("ETag", "X-Correlation-ID")
+            .AllowCredentials());
 });
 
 builder.Services
@@ -301,7 +302,7 @@ app.MapHealthChecks("/health/ready", new HealthCheckOptions { Predicate = r => r
 app.MapControllers();
 
 // SignalR hub endpoint
-app.MapHub<Library.Api.Hubs.LibraryHub>("/hubs/library");
+app.MapHub<Library.Api.Hubs.LibraryHub>("/hubs/library").RequireCors("SpaCors");
 
 app.Run();
 
