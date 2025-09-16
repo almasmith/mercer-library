@@ -7,6 +7,7 @@ using Library.Api.Data;
 using Library.Api.Domain;
 using Library.Api.Dtos;
 using Library.Api.Services.Books;
+using Library.Api.Services.Stats;
 using Library.Api.Hubs;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,17 +17,27 @@ namespace Library.Api.Services.Favorites
     {
         private readonly LibraryDbContext _db;
         private readonly IRealtimePublisher _publisher;
+        private readonly IStatsVersionService _stats;
 
         public FavoritesService(LibraryDbContext db)
         {
             _db = db;
             _publisher = null!; // optional for tests; DI uses the 2-arg ctor
+            _stats = null!; // optional for tests; DI uses the 3-arg ctor when available
         }
 
         public FavoritesService(LibraryDbContext db, IRealtimePublisher publisher)
         {
             _db = db;
             _publisher = publisher;
+            _stats = null!; // optional when stats service is not registered
+        }
+
+        public FavoritesService(LibraryDbContext db, IRealtimePublisher publisher, IStatsVersionService stats)
+        {
+            _db = db;
+            _publisher = publisher;
+            _stats = stats;
         }
 
         public async Task<bool> FavoriteAsync(Guid userId, Guid bookId, CancellationToken ct)
@@ -69,6 +80,11 @@ namespace Library.Api.Services.Favorites
                 {
                     await _publisher.BookFavorited(userId, bookId, ct);
                 }
+                if (_stats != null)
+                {
+                    // Bump stats version only when state actually changed
+                    await _stats.BumpAsync(userId, ct);
+                }
                 return true;
             }
             catch (DbUpdateException)
@@ -104,6 +120,11 @@ namespace Library.Api.Services.Favorites
             if (_publisher != null)
             {
                 await _publisher.BookUnfavorited(userId, bookId, ct);
+            }
+            if (deleted > 0 && _stats != null)
+            {
+                // Only bump when a row was actually deleted (state change)
+                await _stats.BumpAsync(userId, ct);
             }
             return true;
         }
