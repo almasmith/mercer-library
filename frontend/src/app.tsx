@@ -1,6 +1,8 @@
 import { Routes, Route } from "react-router-dom";
 import AppLayout from "./app-layout";
-import HomePage from "./routes/home";
+import BooksListPage from "./routes/books/list";
+import NewBookPage from "./routes/books/new";
+import EditBookPage from "./routes/books/edit";
 import NotFoundPage from "./routes/not-found";
 import RequireAuth from "@/features/auth/components/require-auth";
 import LoginPage from "./routes/auth/login";
@@ -14,10 +16,28 @@ export default function App() {
           index
           element={
             <RequireAuth>
-              <HomePage />
+              <BooksListPage />
             </RequireAuth>
           }
         />
+        <Route path="books">
+          <Route
+            path="new"
+            element={
+              <RequireAuth>
+                <NewBookPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path=":id/edit"
+            element={
+              <RequireAuth>
+                <EditBookPage />
+              </RequireAuth>
+            }
+          />
+        </Route>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
       </Route>
