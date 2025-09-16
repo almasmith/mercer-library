@@ -84,18 +84,6 @@ namespace Library.Api.Services.Analytics
                 .AsNoTracking()
                 .Where(r => r.UserId == userId);
 
-            if (from.HasValue)
-            {
-                var fromValue = from.Value;
-                reads = reads.Where(r => r.OccurredAt >= fromValue);
-            }
-
-            if (to.HasValue)
-            {
-                var toValue = to.Value;
-                reads = reads.Where(r => r.OccurredAt <= toValue);
-            }
-
             var joined = reads
                 .Join(
                     _db.Books.AsNoTracking(),
@@ -106,6 +94,19 @@ namespace Library.Api.Services.Analytics
 
             // Materialize then group in-memory for cross-provider compatibility (SQLite/SqlServer)
             var items = await joined.ToListAsync(ct);
+
+            // Apply optional range filtering in-memory for cross-provider compatibility
+            if (from.HasValue)
+            {
+                var fromValue = from.Value;
+                items = items.Where(x => x.OccurredAt >= fromValue).ToList();
+            }
+
+            if (to.HasValue)
+            {
+                var toValue = to.Value;
+                items = items.Where(x => x.OccurredAt <= toValue).ToList();
+            }
 
             var buckets = items
                 .GroupBy(x => new { x.OccurredAt.UtcDateTime.Year, x.OccurredAt.UtcDateTime.Month })
@@ -129,18 +130,6 @@ namespace Library.Api.Services.Analytics
                 .AsNoTracking()
                 .Where(r => r.UserId == userId);
 
-            if (from.HasValue)
-            {
-                var fromValue = from.Value;
-                reads = reads.Where(r => r.OccurredAt >= fromValue);
-            }
-
-            if (to.HasValue)
-            {
-                var toValue = to.Value;
-                reads = reads.Where(r => r.OccurredAt <= toValue);
-            }
-
             var joined = reads
                 .Join(
                     _db.Books.AsNoTracking(),
@@ -150,6 +139,19 @@ namespace Library.Api.Services.Analytics
                 );
 
             var items = await joined.ToListAsync(ct);
+
+            // Apply optional range filtering in-memory for cross-provider compatibility
+            if (from.HasValue)
+            {
+                var fromValue = from.Value;
+                items = items.Where(x => x.OccurredAt >= fromValue).ToList();
+            }
+
+            if (to.HasValue)
+            {
+                var toValue = to.Value;
+                items = items.Where(x => x.OccurredAt <= toValue).ToList();
+            }
 
             var results = items
                 .Select(x => new
