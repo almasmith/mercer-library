@@ -40,6 +40,19 @@ namespace Library.Api.Services.Favorites
                 return false; // controller will translate to 404
             }
 
+            // Idempotency pre-check to avoid EF tracking conflicts within the same DbContext
+            var alreadyFavorited = await _db.Favorites
+                .AsNoTracking()
+                .AnyAsync(f => f.UserId == userId && f.BookId == bookId, ct);
+            if (alreadyFavorited)
+            {
+                if (_publisher != null)
+                {
+                    await _publisher.BookFavorited(userId, bookId, ct);
+                }
+                return true;
+            }
+
             // Try to insert; treat duplicates as success for idempotency
             var favorite = new Favorite
             {
