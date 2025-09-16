@@ -10,7 +10,9 @@
     "preview": "vite preview",
     "lint:fix": "ESLINT_USE_FLAT_CONFIG=false eslint . --ext .ts,.tsx --fix",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "codegen": "openapi-typescript ../docs/openapi.json -o src/types/api.d.ts",
+    "codegen:watch": "chokidar ../docs/openapi.json -c \"npm run codegen\""
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -34,6 +36,7 @@
     "@typescript-eslint/parser": "^8.44.0",
     "@vitejs/plugin-react": "^5.0.0",
     "autoprefixer": "^10.4.21",
+    "chokidar-cli": "^3.0.0",
     "eslint": "^9.35.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-import-resolver-typescript": "^4.4.4",
@@ -42,6 +45,7 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^16.3.0",
+    "openapi-typescript": "^7.9.1",
     "postcss": "^8.5.6",
     "prettier": "^3.6.2",
     "prettier-plugin-tailwindcss": "^0.6.14",
