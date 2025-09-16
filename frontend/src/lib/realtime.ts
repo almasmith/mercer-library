@@ -7,6 +7,8 @@ let connection: HubConnection | null = null;
 let status: RealtimeStatus = "disconnected";
 const subscribers = new Set<(s: RealtimeStatus) => void>();
 let tokenProvider: (() => string | undefined) | undefined;
+// Keep track of desired event handlers to attach when a connection exists
+const eventHandlers = new Map<string, Set<(...args: unknown[]) => void>>();
 
 function notify(next: RealtimeStatus) {
   status = next;
@@ -33,6 +35,14 @@ export function getRealtimeStatus(): RealtimeStatus {
   return status;
 }
 
+function attachAllHandlers(conn: HubConnection) {
+  for (const [event, handlers] of eventHandlers) {
+    for (const handler of handlers) {
+      conn.on(event, handler);
+    }
+  }
+}
+
 export async function connectRealtime(): Promise<HubConnection> {
   const token = tokenProvider?.();
   if (!token) {
@@ -57,6 +67,9 @@ export async function connectRealtime(): Promise<HubConnection> {
     notify("disconnected");
   });
 
+  // Ensure any previously registered handlers are wired up on this connection
+  attachAllHandlers(conn);
+
   await conn.start();
   connection = conn;
   notify("connected");
@@ -77,10 +90,23 @@ export async function disconnectRealtime(): Promise<void> {
 }
 
 export function onEvent<TArgs extends unknown[]>(event: string, handler: (...args: TArgs) => void) {
-  if (!connection) return () => {};
-  connection.on(event, handler as (...args: unknown[]) => void);
+  const typed = handler as (...args: unknown[]) => void;
+  let set = eventHandlers.get(event);
+  if (!set) {
+    set = new Set();
+    eventHandlers.set(event, set);
+  }
+  set.add(typed);
+  if (connection) {
+    connection.on(event, typed);
+  }
   return () => {
-    try { connection?.off(event, handler as (...args: unknown[]) => void); } catch { /* ignore */ }
+    const s = eventHandlers.get(event);
+    if (s) {
+      s.delete(typed);
+      if (s.size === 0) eventHandlers.delete(event);
+    }
+    try { connection?.off(event, typed); } catch { /* ignore */ }
   };
 }
 
