@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { setAccessTokenProvider } from "@/lib/http";
 import type { AuthResponse } from "../types/auth";
 
 type AuthState = {
@@ -78,6 +79,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     () => ({ ...state, isAuthenticated, setAuth, logout }),
     [state, isAuthenticated, setAuth, logout],
   );
+
+  // Bridge the access token to the HTTP layer (idempotent assignment).
+  setAccessTokenProvider(() => state.accessToken);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
