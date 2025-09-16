@@ -74,7 +74,45 @@ namespace Library.Api.Data
                 ("Shards of Code", "J. Fowler", "Technology", now.AddYears(-1), 5),
                 ("Whispers in Pine", "R. Tanaka", "Thriller", now.AddYears(-9), 4),
                 ("Cinder & Snow", "E. Park", "Fantasy", now.AddYears(-16), 5),
-                ("The Last Harvest", "T. O’Neill", "Drama", now.AddYears(-7), 4)
+                ("The Last Harvest", "T. O’Neill", "Drama", now.AddYears(-7), 4),
+
+                // Additional Mystery (4 more)
+                ("Midnight Margins", "C. Ellery", "Mystery", now.AddYears(-10).AddMonths(-2), 4),
+                ("Case of the Vanished Key", "P. Moran", "Mystery", now.AddYears(-8), 5),
+                ("Shadows at Dusk", "I. Romero", "Mystery", now.AddYears(-6), 3),
+                ("A Quiet Alibi", "V. Chen", "Mystery", now.AddYears(-4).AddMonths(-5), 4),
+
+                // Additional Sci-Fi (3 more)
+                ("Orbit of Glass", "N. Flores", "Sci-Fi", now.AddYears(-5), 4),
+                ("Quantum Drift", "R. Ames", "Sci-Fi", now.AddYears(-2), 5),
+                ("Starlight Protocol", "J. Kwan", "Sci-Fi", now.AddYears(-1).AddMonths(-7), 4),
+
+                // Additional Historical (1 more)
+                ("Embers of Empire", "G. Kovacs", "Historical", now.AddYears(-31), 4),
+
+                // Additional Romance (2 more)
+                ("Lavender Letters", "S. Marino", "Romance", now.AddYears(-11), 3),
+                ("Autumn Promises", "H. Nguyen", "Romance", now.AddYears(-3).AddMonths(-9), 4),
+
+                // Additional Technology (5 more)
+                ("Refactoring the Future", "T. Patel", "Technology", now.AddMonths(-18), 5),
+                ("Distributed Dreams", "E. Santos", "Technology", now.AddMonths(-9), 4),
+                ("The Bug Hunter's Diary", "K. Rivera", "Technology", now.AddMonths(-6), 4),
+                ("Edge of Reliability", "B. Ortega", "Technology", now.AddMonths(-3), 5),
+                ("Patterns in Motion", "D. Yamada", "Technology", now.AddMonths(-1), 5),
+
+                // Additional Thriller (2 more)
+                ("The Glass Cipher", "L. Serrano", "Thriller", now.AddYears(-13), 4),
+                ("Under False Lights", "M. Kowalski", "Thriller", now.AddYears(-2).AddMonths(-2), 3),
+
+                // Additional Fantasy (4 more)
+                ("Ash and Azure", "R. Vance", "Fantasy", now.AddYears(-18), 5),
+                ("Crown of Salt", "Y. Adler", "Fantasy", now.AddYears(-12), 4),
+                ("Warden of Hollow Ways", "P. D’Souza", "Fantasy", now.AddYears(-9), 5),
+                ("The Last Witch's Oath", "K. Beaumont", "Fantasy", now.AddYears(-5).AddMonths(-4), 4),
+
+                // Additional Drama (1 more)
+                ("Between Quiet Hours", "A. Rahman", "Drama", now.AddYears(-1).AddMonths(-11), 4)
             };
 
             var existingTitles = await db.Books

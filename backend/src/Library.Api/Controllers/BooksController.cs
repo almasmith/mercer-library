@@ -1,17 +1,20 @@
 using System;
 using System.Collections.Generic;
 using System.Net.Mime;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using Library.Api.Domain;
 using Library.Api.Dtos;
+using Library.Api.Data;
 using Library.Api.Infrastructure;
 using Library.Api.Services;
 using Library.Api.Services.Books;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -25,12 +28,14 @@ public sealed class BooksController : ControllerBase
     private readonly IBookService _bookService;
     private readonly IMapper _mapper;
     private readonly ILogger<BooksController> _logger;
+    private readonly LibraryDbContext _db;
 
-    public BooksController(IBookService bookService, IMapper mapper, ILogger<BooksController> logger)
+    public BooksController(IBookService bookService, IMapper mapper, ILogger<BooksController> logger, LibraryDbContext db)
     {
         _bookService = bookService;
         _mapper = mapper;
         _logger = logger;
+        _db = db;
     }
 
     [HttpGet]
@@ -127,6 +132,38 @@ public sealed class BooksController : ControllerBase
         }
 
         return NoContent();
+    }
+
+    [HttpGet("stats")]
+    [Produces(MediaTypeNames.Application.Json)]
+    [SwaggerOperation(Summary = "Book stats by genre", Description = "Returns genre counts for the authenticated user. Excludes empty/null genres. Case-insensitive grouping with whitespace trimming.")]
+    [SwaggerResponse(StatusCodes.Status200OK, "Stats calculated", typeof(IEnumerable<BookGenreCountDto>))]
+    public async Task<IActionResult> Stats(CancellationToken ct)
+    {
+        var ownerUserId = UserContext.GetUserId(HttpContext);
+
+        var genres = await _db.Books
+            .AsNoTracking()
+            .Where(b => b.OwnerUserId == ownerUserId)
+            .Select(b => b.Genre)
+            .ToListAsync(ct);
+
+        var results = genres
+            .Select(g => (g ?? string.Empty).Trim())
+            .Where(s => s.Length > 0)
+            .GroupBy(s => s, StringComparer.OrdinalIgnoreCase)
+            .Select(g => new
+            {
+                Canonical = g.OrderBy(s => s, StringComparer.Ordinal).First(),
+                Count = g.Count(),
+                NormalizedLower = g.Key.ToLowerInvariant()
+            })
+            .OrderByDescending(x => x.Count)
+            .ThenBy(x => x.NormalizedLower, StringComparer.Ordinal)
+            .Select(x => new BookGenreCountDto(x.Canonical, x.Count))
+            .ToList();
+
+        return Ok(results);
     }
 }
 
