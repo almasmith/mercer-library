@@ -12,12 +12,21 @@
 dotnet restore backend/Library.sln
 # Frontend
 npm --prefix frontend install
+# Frontend env
+cp frontend/env.example frontend/.env
+```
+
+## Database
+- **Development:** Migrations are applied automatically on first run and dev data is seeded; no manual step required.
+- **Non-development:** Apply migrations manually:
+```bash
+dotnet ef database update --project backend/src/Library.Api --startup-project backend/src/Library.Api
 ```
 
 ## Run both apps concurrently
 - Terminal A (API):
 ```bash
-dotnet run --project backend/src/Library.Api/Library.Api.csproj --no-build --launch-profile https
+dotnet run --project backend/src/Library.Api/Library.Api.csproj --launch-profile https
 ```
 - Terminal B (SPA):
 ```bash
@@ -26,7 +35,7 @@ npm --prefix frontend run dev
 ```
 
 ## Verify
-- API Swagger: http://localhost:7186/swagger
+- API Swagger: https://localhost:7186/swagger
 - SPA: http://localhost:5173
 
 ## Auth
