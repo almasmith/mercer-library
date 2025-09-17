@@ -4,10 +4,16 @@ import type { Book } from "@/features/books/types/book";
 
 export function collectFavoritedIds(queryClient: QueryClient): Set<string> {
   const ids = new Set<string>();
-  const entries = queryClient.getQueriesData<{ items: Book[] }>({ queryKey: favoritesKeys.all });
+  const index = queryClient.getQueryData<Set<string>>(favoritesKeys.index());
+  if (index) index.forEach((id) => ids.add(id));
+
+  const entries = queryClient.getQueriesData<unknown>({ queryKey: favoritesKeys.all });
   for (const [, data] of entries) {
-    if (!data?.items) continue;
-    data.items.forEach(b => ids.add(b.id));
+    // Favorites lists
+    const items = (data as { items?: Array<Pick<Book, "id">> } | undefined)?.items;
+    if (Array.isArray(items)) {
+      items.forEach((b) => ids.add(b.id));
+    }
   }
   return ids;
 }

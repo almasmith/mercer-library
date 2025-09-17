@@ -9,7 +9,7 @@ export function useIsFavorited(bookId: string): boolean {
   useEffect(() => {
     setIsFav(collectFavoritedIds(qc).has(bookId));
     const unsub = qc.getQueryCache().subscribe((event) => {
-      if (event?.type !== "updated") return;
+      // React to any query event touching favorites (added, updated, removed)
       const key = event.query?.queryKey;
       if (!Array.isArray(key)) return;
       if ((key[0] as unknown) === favoritesKeys.all[0]) {
