@@ -29,6 +29,10 @@ npm --prefix frontend run dev
 - API Swagger: http://localhost:7186/swagger
 - SPA: http://localhost:5173
 
+## Auth
+- Login with the seed credentials: test@example.com Passw0rd!
+- With Swagger, click authorize and paste in the auth token from the login result
+
 ## Project structure
 ```
 backend/   .NET Web API, EF Core, migrations
@@ -43,5 +47,5 @@ docs/      OpenAPI (Swagger) JSON and docs
 - ETag, conditional requests, and realtime SignalR updates for good UX
 - Pagination and filtering designed to scale to larger datasets
 
-## OpenAPI / API testing
+## OpenAPI 
 - Spec file: `docs/openapi.json`

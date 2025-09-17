@@ -18,6 +18,7 @@ dotnet run --project backend/src/Library.Api/Library.Api.csproj --no-build --lau
 
 ## Verify
 - API Swagger: http://localhost:7186/swagger
+- To explore the API with Swagger you must authenticate. Use the login api to get an auth token, and then enter it using the Authorize button.
 
 ## OpenAPI / API testing
 - The OpenAPI spec is stored at `docs/openapi.json`.
