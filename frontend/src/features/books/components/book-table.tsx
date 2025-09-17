@@ -58,23 +58,23 @@ export function BookTable({ useData = useBooks }: { useData?: (p: ListParams) =>
   return (
     <div className="space-y-3">
       <Confirm />
-      <div className="flex flex-wrap items-end justify-between gap-2">
-        <div className="flex flex-wrap items-end gap-2">
-          <div>
+      <div className="flex flex-wrap items-end gap-2 lg:flex-nowrap">
+        <div className="flex flex-wrap items-end gap-2 lg:flex-nowrap">
+          <div className="min-w-[12rem] flex-1">
           <label className="block text-sm">Search</label>
           <input
             type="text"
-            className="input-sm mt-1"
+            className="input-sm mt-1 w-full"
             value={listParams.search ?? ""}
             onChange={(e) => setListParams({ search: e.target.value, page: 1 })}
             placeholder="Title or author"
           />
           </div>
-          <div>
+          <div className="min-w-[12rem] flex-1">
           <label className="block text-sm">Genre</label>
           <input
             type="text"
-            className="input-sm mt-1"
+            className="input-sm mt-1 w-full"
             value={listParams.genre ?? ""}
             onChange={(e) => setListParams({ genre: e.target.value, page: 1 })}
             placeholder="e.g., Sci-Fi"
@@ -90,18 +90,21 @@ export function BookTable({ useData = useBooks }: { useData?: (p: ListParams) =>
               value={listParams.maxRating ?? ""} onChange={(e) => setListParams({ maxRating: e.target.value ? Number(e.target.value) : undefined, page: 1 })}/>
           </div>
           </div>
-          <div>
+          <div className="whitespace-nowrap">
           <label className="block text-sm">Published</label>
-          <div className="mt-1 flex items-center gap-1">
+          <div className="mt-1 flex items-center gap-1 flex-nowrap">
             <DateInput size="sm" value={listParams.publishedFrom ?? undefined} onChange={(v) => setListParams({ publishedFrom: v, page: 1 })} />
             <span>→</span>
             <DateInput size="sm" value={listParams.publishedTo ?? undefined} onChange={(v) => setListParams({ publishedTo: v, page: 1 })} />
+            <Link
+              to="/books/new"
+              className="ml-2 inline-flex h-9 items-center gap-2 shrink-0 rounded bg-blue-600 px-3 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300"
+            >
+              <span className="text-sm font-medium">Add book</span>
+            </Link>
           </div>
           </div>
         </div>
-        <a href="/books/new" className="ml-auto inline-flex h-9 items-center gap-2 rounded bg-blue-600 px-3 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300">
-          <span className="text-sm font-medium">Add book</span>
-        </a>
       </div>
 
       <div className="overflow-x-auto">
