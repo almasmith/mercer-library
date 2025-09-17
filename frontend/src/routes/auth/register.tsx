@@ -36,25 +36,27 @@ export default function RegisterPage() {
 
   return (
     <section className="mx-auto max-w-sm">
-      <h1 className="mb-4 text-xl font-semibold">Register</h1>
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
-        <div>
-          <label className="block text-sm">Email</label>
-          <input type="email" className="mt-1 w-full rounded border px-3 py-2" {...register("email")} />
-          {errors.email?.message && <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>}
-        </div>
-        <div>
-          <label className="block text-sm">Password</label>
-          <input type="password" className="mt-1 w-full rounded border px-3 py-2" {...register("password")} />
-          {errors.password?.message && <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>}
-        </div>
-        <button disabled={isSubmitting} className="rounded bg-slate-900 px-3 py-2 text-white disabled:opacity-60">
-          {isSubmitting ? "Creating..." : "Create account"}
-        </button>
-      </form>
-      <p className="mt-3 text-sm">
-        Already have an account? <Link to="/login" className="text-slate-900 underline">Login</Link>
-      </p>
+      <div className="card p-4">
+        <h1 className="mb-4 text-xl font-semibold">Create your account</h1>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
+          <div>
+            <label className="block text-sm">Email</label>
+            <input type="email" className="input mt-1" {...register("email")} />
+            {errors.email?.message && <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>}
+          </div>
+          <div>
+            <label className="block text-sm">Password</label>
+            <input type="password" className="input mt-1" {...register("password")} />
+            {errors.password?.message && <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>}
+          </div>
+          <button disabled={isSubmitting} className="btn-primary">
+            {isSubmitting ? "Creating..." : "Create account"}
+          </button>
+        </form>
+        <p className="mt-3 text-sm">
+          Already have an account? <Link to="/login" className="text-slate-900 underline">Login</Link>
+        </p>
+      </div>
     </section>
   );
 }

@@ -1,3 +1,5 @@
+import { DateInput } from "@/features/books/components/date-input";
+
 export function DateRangeControls({
   from,
   to,
@@ -8,14 +10,13 @@ export function DateRangeControls({
   onChange: (next: { from?: string; to?: string }) => void;
 }) {
   return (
-    <div className="flex flex-wrap items-end gap-2">
+    <div className="flex flex-wrap items-center gap-2">
       <div>
-        <label className="block text-sm">From</label>
-        <input type="date" className="mt-1 rounded border px-2 py-1" value={from ?? ""} onChange={(e) => onChange({ from: e.target.value || undefined, to })} />
+        <DateInput size="sm" value={from} onChange={(v) => onChange({ from: v, to })} />
       </div>
+      <span className="self-center px-1 text-slate-600">–</span>
       <div>
-        <label className="block text-sm">To</label>
-        <input type="date" className="mt-1 rounded border px-2 py-1" value={to ?? ""} onChange={(e) => onChange({ from, to: e.target.value || undefined })} />
+        <DateInput size="sm" value={to} onChange={(v) => onChange({ from, to: v })} />
       </div>
     </div>
   );

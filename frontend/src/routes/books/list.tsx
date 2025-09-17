@@ -5,12 +5,14 @@ export default function BooksListPage() {
   useBookStats();
   return (
     <section className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="toolbar card items-center p-3">
         <h1 className="text-xl font-semibold">Books</h1>
-        <a href="/books/new" className="rounded bg-slate-900 px-3 py-2 text-white">Add book</a>
+        <p className="text-sm text-slate-500">Manage your library and track ratings</p>
       </div>
       {/* Stats could feed genre suggestions later */}
-      <BookTable />
+      <div className="card p-3">
+        <BookTable />
+      </div>
       {/* Pagination is rendered inside BookTable; this is left for layout flexibility if needed */}
     </section>
   );
