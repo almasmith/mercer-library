@@ -171,3 +171,56 @@ I really liked the format that was generated for the task prompts. I'm going to 
 
 ### .NET & EF
 All the core concepts make sense and map directly to equivalents in other frameworks. But I do have things to learn here (standards, best practices, patterns). My personal philosophy is that AI is most powerful in the hands of experts and I would dedicate myself to becoming an expert in this stack if I were to get the job.
+
+## Challenge Completion
+
+### Backend (C# /.NET Core)
+- [x] Scaffold a new ASP.NET Core Web API project.
+- [x] Define a Book model with fields:
+- [x] Implement CRUD endpoints for Book:
+- [x] Add an endpoint GET /api/books/stats that returns the number of books per genre.
+- [x] Use Entity Framework Core with migrations to persist data in SQLite or SQL Server.
+- [x] Configure Swagger/OpenAPI for API exploration.
+
+### Frontend (React)
+- [x] Bootstrap a React app (Create React App, Vite, or equivalent).
+- [x] Implement pages/components:
+  - [x] Book List: fetch and display all books in a table or cards.
+  - [x] Book Form: create and edit books (reuse component for both).
+  - [x] Stats View: fetch /api/books/stats and render a bar or pie chart (use a library
+    of your choice).
+
+- [x] Organize code into clear “presentation” vs. “API” layers (e.g. custom hooks or services
+  for data fetching).
+
+- [x] Handle loading, success, and error states for all API interactions.
+- [x] Ensure forms have basic validation (required fields, rating range).
+
+### Deliverables
+
+- [x] A GitHub repository (or ZIP) containing:
+  - [x] backend/ folder with the .NET solution, EF migrations, and instructions.
+  - [x] frontend/ folder with the React source and setup instructions.
+  - [x] A root README outlining:
+    - [x] Prerequisites and setup steps (dotnet ef database update, npm
+      install, etc.)
+    - [x] How to run both apps concurrently.
+    - [x] Any design decisions or trade-offs.
+- [x] Swagger/OpenAPI collection for API testing.
+
+### Bonus
+
+- [x] Secure endpoints with JWT authentication and allow multiple users to manage their own
+  books.
+- [ ] Containerize backend and frontend with Docker and provide a docker-compose.yml.
+- [x] Write unit tests for API controllers
+- [ ] Write unit tests for React components.
+- [ ] Deploy to a cloud provider (e.g., Azure App Service, AWS Elastic Beanstalk).
+- [x] Implement sorting and filtering on the Book List (by genre, rating, or published date).
+
+### Further Exploration
+
+- [x] Adding a “favorites” feature backed by a many-to-many relationship.
+- [x] Integrating real-time updates with SignalR so multiple clients see changes live.
+- [x] Improving analytics (e.g., average rating over time, most-read genres).
+- [ ] Setting up a CI/CD pipeline to automate tests and deployment on Git pushes.
