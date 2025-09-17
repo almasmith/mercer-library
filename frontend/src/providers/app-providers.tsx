@@ -6,6 +6,7 @@ import { queryClient } from "../lib/query-client";
 import { ThemeProvider } from "./theme-provider";
 import { ToastProvider } from "./toast-provider";
 import { RealtimeSubscriptions } from "@/features/realtime/realtime-subscriptions";
+import { useFavoritesIndex } from "@/features/favorites/hooks/use-favorites-index";
 
 export function AppProviders({ children }: { children: ReactNode }) {
   return (
@@ -15,6 +16,8 @@ export function AppProviders({ children }: { children: ReactNode }) {
           <AuthProvider>
             <BrowserRouter>
               <RealtimeSubscriptions />
+              {/* Seed favorites index so stars render from cache immediately */}
+              <FavoritesIndexLoader />
               {children}
             </BrowserRouter>
           </AuthProvider>
@@ -22,4 +25,9 @@ export function AppProviders({ children }: { children: ReactNode }) {
       </ThemeProvider>
     </QueryClientProvider>
   );
+}
+
+function FavoritesIndexLoader() {
+  useFavoritesIndex();
+  return null;
 }
