@@ -1,6 +1,5 @@
 # Mercer Library – Challenge Deliverables
 
-<!-- BEGIN:ROOT-CHALLENGE-README -->
 ## Prerequisites
 - .NET 9 SDK (or .NET 8 if applicable)
 - Node.js 20+ and npm
@@ -18,15 +17,16 @@ npm --prefix frontend install
 ## Run both apps concurrently
 - Terminal A (API):
 ```bash
-dotnet watch run --project backend/src/Library.Api
+dotnet run --project backend/src/Library.Api/Library.Api.csproj --no-build --launch-profile https
 ```
 - Terminal B (SPA):
 ```bash
+# From repository root
 npm --prefix frontend run dev
 ```
 
 ## Verify
-- API Swagger: http://localhost:5000/swagger
+- API Swagger: http://localhost:7186/swagger
 - SPA: http://localhost:5173
 
 ## Project structure
@@ -45,8 +45,3 @@ docs/      OpenAPI (Swagger) JSON and docs
 
 ## OpenAPI / API testing
 - Spec file: `docs/openapi.json`
-- Update from a running API (optional):
-```bash
-curl -fsS http://localhost:5000/swagger/v1/swagger.json -o docs/openapi.json
-```
-<!-- END:ROOT-CHALLENGE-README -->

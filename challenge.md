@@ -64,7 +64,7 @@ json
       install, etc.)
     - How to run both apps concurrently.
     - Any design decisions or trade-offs.
-- Swagger/OpenAPI or Postman collection for API testing.
+- Swagger/OpenAPI collection for API testing.
 
 ## Evaluation Criteria
 

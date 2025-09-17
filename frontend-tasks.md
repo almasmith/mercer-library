@@ -173,7 +173,7 @@ Note: Frontend-only. Excludes all backend and broader DevOps (Docker/CI/CD) task
   - DoD: Status reflects actual SignalR state.
   - Badge reflects `connecting/reconnecting/connected/disconnected` states, including auth-change transitions.
 
-### Track I — Accessibility & UX Polish
+### Track I — Accessibility & UX Polish (Skipped)
 
 - [F32] A11y pass
   - Labels/ARIA for inputs, combobox, dialogs, pagination; keyboard navigation.
@@ -187,7 +187,7 @@ Note: Frontend-only. Excludes all backend and broader DevOps (Docker/CI/CD) task
   - Consistent toast variants; map ProblemDetails to user-friendly messages.
   - DoD: Error toasts show actionable info.
 
-### Track J — Testing
+### Track J — Testing (Skipped)
 
 - [F35] Test harness & MSW
   - Vitest + RTL + user-event; MSW handlers for all API routes.
@@ -209,7 +209,7 @@ Note: Frontend-only. Excludes all backend and broader DevOps (Docker/CI/CD) task
   - Mock SignalR client; simulate hub events; verify cache updates.
   - DoD: Cache reflects events without manual refetch.
 
-### Track K — Performance & Code Splitting
+### Track K — Performance & Code Splitting (Skipped)
 
 - [F40] Bundle optimization
   - Dynamic imports for charts and heavy UI; analyze bundle.
