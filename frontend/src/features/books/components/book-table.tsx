@@ -53,9 +53,7 @@ export function BookTable({ useData = useBooks }: { useData?: (p: any) => { data
     setListParams({ sortBy: DEFAULT_SORT.sortBy as any, sortOrder: DEFAULT_SORT.sortOrder as any });
   };
 
-  if (isLoading) return <div>Loading…</div>;
-  if (isError) return <div role="alert">Failed to load books.</div>;
-  if (!data || data.items.length === 0) return <div>No books found.</div>;
+  
 
   return (
     <div className="space-y-3">
@@ -104,48 +102,56 @@ export function BookTable({ useData = useBooks }: { useData?: (p: any) => { data
       </div>
 
       <div className="overflow-x-auto">
-        <table className="min-w-full border text-left text-sm">
-          <thead className="bg-slate-50">
-            <tr>
-              <th className="border-b px-3 py-2" aria-label="Favorite" />
-              {["title","author","genre","publishedDate","rating","createdAt"].map((col) => (
-                <th key={col} className="cursor-pointer border-b px-3 py-2" onClick={() => toggleSort(col as any)}>
-                  {col}
-                  {listParams.sortBy === col ? (listParams.sortOrder === "asc" ? " ▲" : " ▼") : null}
-                </th>
-              ))}
-              <th className="border-b px-3 py-2">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.items.map((b: any) => (
-              <tr key={b.id} className="border-b">
-                <td className="px-3 py-2">
-                  <FavoriteToggle bookId={b.id} />
-                </td>
-                <td className="px-3 py-2">{b.title}</td>
-                <td className="px-3 py-2">{b.author}</td>
-                <td className="px-3 py-2">{b.genre}</td>
-                <td className="px-3 py-2">{new Date(b.publishedDate).toISOString().slice(0,10)}</td>
-                <td className="px-3 py-2">{b.rating}</td>
-                <td className="px-3 py-2">{new Date(b.createdAt).toLocaleString()}</td>
-                <td className="px-3 py-2">
-                  <Link to={`/books/${b.id}/edit`} className="mr-2 underline">Edit</Link>
-                  <button className="text-red-700 underline" onClick={async () => {
-                    const ok = await confirm(`Delete "${b.title}"? This cannot be undone.`);
-                    if (!ok) return;
-                    const prev = data.items;
-                    (data.items as any) = data.items.filter((x: any) => x.id !== b.id);
-                    try { await del.mutateAsync(b.id); }
-                    catch { (data.items as any) = prev; alert("Failed to delete"); }
-                  }}>Delete</button>
-                </td>
+        {isLoading ? (
+          <div>Loading…</div>
+        ) : isError ? (
+          <div role="alert">Failed to load books.</div>
+        ) : data?.items?.length ? (
+          <table className="min-w-full border text-left text-sm">
+            <thead className="bg-slate-50">
+              <tr>
+                <th className="border-b px-3 py-2" aria-label="Favorite" />
+                {["title","author","genre","publishedDate","rating","createdAt"].map((col) => (
+                  <th key={col} className="cursor-pointer border-b px-3 py-2" onClick={() => toggleSort(col as any)}>
+                    {col}
+                    {listParams.sortBy === col ? (listParams.sortOrder === "asc" ? " ▲" : " ▼") : null}
+                  </th>
+                ))}
+                <th className="border-b px-3 py-2">Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {data.items.map((b: any) => (
+                <tr key={b.id} className="border-b">
+                  <td className="px-3 py-2">
+                    <FavoriteToggle bookId={b.id} />
+                  </td>
+                  <td className="px-3 py-2">{b.title}</td>
+                  <td className="px-3 py-2">{b.author}</td>
+                  <td className="px-3 py-2">{b.genre}</td>
+                  <td className="px-3 py-2">{new Date(b.publishedDate).toISOString().slice(0,10)}</td>
+                  <td className="px-3 py-2">{b.rating}</td>
+                  <td className="px-3 py-2">{new Date(b.createdAt).toLocaleString()}</td>
+                  <td className="px-3 py-2">
+                    <Link to={`/books/${b.id}/edit`} className="mr-2 underline">Edit</Link>
+                    <button className="text-red-700 underline" onClick={async () => {
+                      const ok = await confirm(`Delete "${b.title}"? This cannot be undone.`);
+                      if (!ok) return;
+                      const prev = data.items;
+                      (data.items as any) = data.items.filter((x: any) => x.id !== b.id);
+                      try { await del.mutateAsync(b.id); }
+                      catch { (data.items as any) = prev; alert("Failed to delete"); }
+                    }}>Delete</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <div className="text-sm text-slate-600">No matching books.</div>
+        )}
       </div>
-      <Pagination totalItems={data.totalItems} />
+      <Pagination totalItems={data?.totalItems ?? 0} />
     </div>
   );
 }
