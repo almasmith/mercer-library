@@ -121,7 +121,7 @@ export function BookTable({ useData = useBooks }: { useData?: (p: any) => { data
             {data.items.map((b: any) => (
               <tr key={b.id} className="border-b">
                 <td className="px-3 py-2">
-                  <FavoriteToggle bookId={b.id} initialOn={false} />
+                  <FavoriteToggle bookId={b.id} />
                 </td>
                 <td className="px-3 py-2">{b.title}</td>
                 <td className="px-3 py-2">{b.author}</td>

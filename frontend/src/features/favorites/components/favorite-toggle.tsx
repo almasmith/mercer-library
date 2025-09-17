@@ -1,34 +1,36 @@
 import { useState } from "react";
 import { useFavorite, useUnfavorite } from "@/features/favorites/hooks/use-favorites";
+import { useIsFavorited } from "@/features/favorites/hooks/use-is-favorited";
 
 export function FavoriteToggle({
   bookId,
-  initialOn = false,
   listParams,
   onChange,
 }: {
   bookId: string;
-  initialOn?: boolean;
   listParams?: Parameters<typeof useFavorite>[1];
   onChange?: (isOn: boolean) => void;
 }) {
-  const [isOn, setIsOn] = useState<boolean>(initialOn);
+  const derivedIsOn = useIsFavorited(bookId);
+  const [pending, setPending] = useState<boolean | null>(null);
   const fav = useFavorite(bookId, listParams);
   const unfav = useUnfavorite(bookId, listParams);
 
   const toggle = async () => {
-    const next = !isOn;
-    setIsOn(next);
+    const next = !derivedIsOn;
+    setPending(next);
     onChange?.(next);
     try {
       if (next) await fav.mutateAsync();
       else await unfav.mutateAsync();
     } catch {
-      setIsOn(!next);
       onChange?.(!next);
-      alert("Failed to update favorite");
+    } finally {
+      setPending(null);
     }
   };
+
+  const isOn = pending ?? derivedIsOn;
 
   return (
     <button
