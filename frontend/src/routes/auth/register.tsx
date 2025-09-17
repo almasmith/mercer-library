@@ -5,6 +5,7 @@ import { registerSchema, type RegisterInput, type AuthResponse } from "@/feature
 import { register as registerApi } from "@/features/auth/api/auth";
 import { useAuth } from "@/features/auth/hooks/use-auth";
 import { mapProblemDetailsErrors } from "@/features/auth/components/field-errors";
+import { HttpError } from "@/lib/http";
 
 export default function RegisterPage() {
   const [params] = useSearchParams();
@@ -22,8 +23,8 @@ export default function RegisterPage() {
       if (res) setAuth(res);
       const returnTo = params.get("returnTo") || "/";
       navigate(returnTo, { replace: true });
-    } catch (err: any) {
-      const pd = err?.problem as { errors?: Record<string, string[]>; title?: string };
+    } catch (err: unknown) {
+      const pd = err instanceof HttpError ? err.problem : undefined;
       if (pd?.errors) {
         const mapped = mapProblemDetailsErrors(pd.errors);
         Object.entries(mapped).forEach(([field, message]) => setError(field as keyof RegisterInput, { message }));

@@ -12,7 +12,7 @@ export function useIsFavorited(bookId: string): boolean {
       // React to any query event touching favorites (added, updated, removed)
       const key = event.query?.queryKey;
       if (!Array.isArray(key)) return;
-      if ((key[0] as unknown) === favoritesKeys.all[0]) {
+      if (key[0] === favoritesKeys.all[0]) {
         setIsFav(collectFavoritedIds(qc).has(bookId));
       }
     });

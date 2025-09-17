@@ -35,7 +35,7 @@ export function setAccessTokenProvider(provider: AccessTokenProvider) {
 
 type CorrelationIdProvider = () => string;
 let getCorrelationId: CorrelationIdProvider = () =>
-  (crypto && "randomUUID" in crypto ? (crypto as any).randomUUID() : Math.random().toString(36).slice(2));
+  (typeof crypto !== "undefined" && "randomUUID" in crypto ? (crypto as { randomUUID: () => string }).randomUUID() : Math.random().toString(36).slice(2));
 
 export function setCorrelationIdProvider(provider: CorrelationIdProvider) {
   getCorrelationId = provider;

@@ -1,4 +1,21 @@
 module.exports = {
+  overrides: [
+    {
+      files: ["**/*.{ts,tsx}"],
+      parser: "@typescript-eslint/parser",
+      plugins: ["@typescript-eslint"],
+      extends: ["plugin:@typescript-eslint/recommended"],
+      rules: {
+        "@typescript-eslint/no-explicit-any": ["error", { ignoreRestArgs: false }],
+        "@typescript-eslint/no-unsafe-assignment": "error",
+        "@typescript-eslint/no-unsafe-member-access": "error",
+        "@typescript-eslint/no-unsafe-call": "error",
+      },
+    },
+  ],
+};
+
+module.exports = {
   root: true,
   env: { browser: true, es2023: true },
   parser: "@typescript-eslint/parser",

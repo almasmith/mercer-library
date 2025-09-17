@@ -2,6 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { BookForm } from "@/features/books/components/book-form";
 import { useBook, useUpdateBook } from "@/features/books/hooks/use-books";
 import { HttpConflictError } from "@/lib/http";
+import type { UpdateBookInput } from "@/features/books/types/book";
 
 export default function EditBookPage() {
   const { id = "" } = useParams();
@@ -24,7 +25,7 @@ export default function EditBookPage() {
         }}
         onSubmit={async (values) => {
           try {
-            await update.mutateAsync(values as any);
+            await update.mutateAsync(values as UpdateBookInput);
             alert("Book updated");
             nav(`/`);
           } catch (err) {

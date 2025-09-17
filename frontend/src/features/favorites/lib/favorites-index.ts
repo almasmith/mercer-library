@@ -7,10 +7,10 @@ export function collectFavoritedIds(queryClient: QueryClient): Set<string> {
   const index = queryClient.getQueryData<Set<string>>(favoritesKeys.index());
   if (index) index.forEach((id) => ids.add(id));
 
-  const entries = queryClient.getQueriesData<unknown>({ queryKey: favoritesKeys.all });
+  const entries = queryClient.getQueriesData<{ items?: Array<Pick<Book, "id">> }>({ queryKey: favoritesKeys.all });
   for (const [, data] of entries) {
     // Favorites lists
-    const items = (data as { items?: Array<Pick<Book, "id">> } | undefined)?.items;
+    const items = data?.items;
     if (Array.isArray(items)) {
       items.forEach((b) => ids.add(b.id));
     }

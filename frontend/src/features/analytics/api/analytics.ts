@@ -1,7 +1,7 @@
 import { httpJson } from "@/lib/http";
 import type { AvgRatingPoint, MostReadGenre, AvgRatingParams, RangeParams } from "../types/analytics";
 
-function toQuery(params: Record<string, unknown>) {
+function toQuery(params: Partial<Record<keyof (AvgRatingParams & RangeParams), unknown>>) {
   const usp = new URLSearchParams();
   Object.entries(params).forEach(([k, v]) => {
     if (v === undefined || v === null || v === "") return;

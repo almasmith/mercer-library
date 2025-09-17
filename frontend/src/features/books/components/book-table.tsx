@@ -5,7 +5,7 @@ import { useBooks } from "@/features/books/hooks/use-books";
 import { useDeleteBook } from "@/features/books/hooks/use-books";
 import { useConfirm } from "@/components/confirm-dialog";
 import type { ListParams } from "@/features/books/api/books";
-import { RATING_MIN, RATING_MAX } from "@/features/books/types/book";
+import { RATING_MIN, RATING_MAX, type Book } from "@/features/books/types/book";
 import { Pagination } from "./pagination";
 import { FavoriteToggle } from "@/features/favorites/components/favorite-toggle";
 
@@ -21,8 +21,8 @@ function useListParams(): [ListParams, (next: Partial<ListParams>) => void] {
       publishedFrom: params.get("publishedFrom") ?? undefined,
       publishedTo: params.get("publishedTo") ?? undefined,
       search: params.get("search") ?? undefined,
-      sortBy: (params.get("sortBy") as ListParams["sortBy"]) ?? (DEFAULT_SORT.sortBy as any),
-      sortOrder: (params.get("sortOrder") as ListParams["sortOrder"]) ?? (DEFAULT_SORT.sortOrder as any),
+      sortBy: (params.get("sortBy") as ListParams["sortBy"]) ?? DEFAULT_SORT.sortBy,
+      sortOrder: (params.get("sortOrder") as ListParams["sortOrder"]) ?? DEFAULT_SORT.sortOrder,
       page: params.get("page") ? Number(params.get("page")) : 1,
       pageSize: params.get("pageSize") ? Number(params.get("pageSize")) : 20,
     };
@@ -39,7 +39,7 @@ function useListParams(): [ListParams, (next: Partial<ListParams>) => void] {
   return [current, update];
 }
 
-export function BookTable({ useData = useBooks }: { useData?: (p: any) => { data?: any; isLoading: boolean; isError: boolean } }) {
+export function BookTable({ useData = useBooks }: { useData?: (p: ListParams) => { data?: { items: Book[]; totalItems: number }; isLoading: boolean; isError: boolean } }) {
   const [listParams, setListParams] = useListParams();
   const { data, isLoading, isError } = useData(listParams);
   const del = useDeleteBook();
@@ -50,10 +50,8 @@ export function BookTable({ useData = useBooks }: { useData?: (p: any) => { data
     if (sortBy !== key) return setListParams({ sortBy: key, sortOrder: "asc" });
     if (sortOrder === "asc") return setListParams({ sortOrder: "desc" });
     // third click resets to default
-    setListParams({ sortBy: DEFAULT_SORT.sortBy as any, sortOrder: DEFAULT_SORT.sortOrder as any });
+    setListParams({ sortBy: DEFAULT_SORT.sortBy, sortOrder: DEFAULT_SORT.sortOrder });
   };
-
-  
 
   return (
     <div className="space-y-3">
@@ -111,8 +109,8 @@ export function BookTable({ useData = useBooks }: { useData?: (p: any) => { data
             <thead className="bg-slate-50">
               <tr>
                 <th className="border-b px-3 py-2" aria-label="Favorite" />
-                {["title","author","genre","publishedDate","rating","createdAt"].map((col) => (
-                  <th key={col} className="cursor-pointer border-b px-3 py-2" onClick={() => toggleSort(col as any)}>
+                {(["title","author","genre","publishedDate","rating","createdAt"] as const).map((col) => (
+                  <th key={col} className="cursor-pointer border-b px-3 py-2" onClick={() => toggleSort(col)}>
                     {col}
                     {listParams.sortBy === col ? (listParams.sortOrder === "asc" ? " ▲" : " ▼") : null}
                   </th>
@@ -121,7 +119,7 @@ export function BookTable({ useData = useBooks }: { useData?: (p: any) => { data
               </tr>
             </thead>
             <tbody>
-              {data.items.map((b: any) => (
+              {data.items.map((b: Book) => (
                 <tr key={b.id} className="border-b">
                   <td className="px-3 py-2">
                     <FavoriteToggle bookId={b.id} />
@@ -138,9 +136,10 @@ export function BookTable({ useData = useBooks }: { useData?: (p: any) => { data
                       const ok = await confirm(`Delete "${b.title}"? This cannot be undone.`);
                       if (!ok) return;
                       const prev = data.items;
-                      (data.items as any) = data.items.filter((x: any) => x.id !== b.id);
+                      // optimistic UI: filter the current list locally
+                      data.items = data.items.filter((x) => x.id !== b.id);
                       try { await del.mutateAsync(b.id); }
-                      catch { (data.items as any) = prev; alert("Failed to delete"); }
+                      catch { data.items = prev; alert("Failed to delete"); }
                     }}>Delete</button>
                   </td>
                 </tr>

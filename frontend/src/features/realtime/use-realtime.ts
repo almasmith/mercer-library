@@ -1,20 +1,38 @@
 import { useEffect } from "react";
 import { onEvent } from "@/lib/realtime";
+import type { RealtimeEvents } from "./events";
 import { useQueryClient } from "@tanstack/react-query";
 import { booksKeys } from "@/features/books/hooks/use-books";
 
 // Optional imports; guard existence at runtime when not present
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-let favoritesKeys: any, analyticsKeys: any;
+type FavoritesKeys = typeof import("@/features/favorites/hooks/use-favorites").favoritesKeys;
+type AnalyticsKeys = typeof import("@/features/analytics/hooks/use-analytics").analyticsKeys;
+let favoritesKeys: FavoritesKeys | undefined;
+let analyticsKeys: AnalyticsKeys | undefined;
 // Declare require for TS since app tsconfig doesn't include Node types
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-declare const require: any;
+declare const require: (id: string) => unknown;
+function isFavoritesModule(mod: unknown): mod is { favoritesKeys: FavoritesKeys } {
+  return !!mod && typeof mod === "object" && "favoritesKeys" in (mod as Record<string, unknown>);
+}
+function isAnalyticsModule(mod: unknown): mod is { analyticsKeys: AnalyticsKeys } {
+  return !!mod && typeof mod === "object" && "analyticsKeys" in (mod as Record<string, unknown>);
+}
 try {
-  ({ favoritesKeys } = require("@/features/favorites/hooks/use-favorites"));
-} catch {}
+  const mod = require("@/features/favorites/hooks/use-favorites");
+  if (isFavoritesModule(mod)) favoritesKeys = mod.favoritesKeys;
+} catch {
+  void 0; // optional module not present
+}
 try {
-  ({ analyticsKeys } = require("@/features/analytics/hooks/use-analytics"));
-} catch {}
+  const mod = require("@/features/analytics/hooks/use-analytics");
+  if (isAnalyticsModule(mod)) analyticsKeys = mod.analyticsKeys;
+} catch {
+  void 0; // optional module not present
+}
+
+function onTyped<T extends keyof RealtimeEvents>(event: T, handler: (payload: RealtimeEvents[T]) => void) {
+  return onEvent<[RealtimeEvents[T]]>(event as string, (payload) => handler(payload));
+}
 
 export function useRealtime() {
   const qc = useQueryClient();
@@ -24,31 +42,31 @@ export function useRealtime() {
 
     // Books CRUD
     unsubs.push(
-      onEvent("bookCreated", (_payload: unknown) => {
+      onTyped("bookCreated", () => {
         // Best-effort: invalidate lists; detail will be fetched when visited
         qc.invalidateQueries({ queryKey: booksKeys.all });
       }),
     );
     unsubs.push(
-      onEvent("bookUpdated", (_payload: unknown) => {
+      onTyped("bookUpdated", () => {
         qc.invalidateQueries({ queryKey: booksKeys.all });
       }),
     );
     unsubs.push(
-      onEvent("bookDeleted", (_payload: { id: string }) => {
+      onTyped("bookDeleted", () => {
         qc.invalidateQueries({ queryKey: booksKeys.all });
       }),
     );
 
     // Favorites
     unsubs.push(
-      onEvent("bookFavorited", () => {
+      onTyped("bookFavorited", () => {
         qc.invalidateQueries({ queryKey: booksKeys.all });
         if (favoritesKeys) qc.invalidateQueries({ queryKey: favoritesKeys.all });
       }),
     );
     unsubs.push(
-      onEvent("bookUnfavorited", () => {
+      onTyped("bookUnfavorited", () => {
         qc.invalidateQueries({ queryKey: booksKeys.all });
         if (favoritesKeys) qc.invalidateQueries({ queryKey: favoritesKeys.all });
       }),
@@ -56,12 +74,12 @@ export function useRealtime() {
 
     // Reads / Stats / Analytics
     unsubs.push(
-      onEvent("bookRead", () => {
+      onTyped("bookRead", () => {
         if (analyticsKeys) qc.invalidateQueries({ queryKey: analyticsKeys.all });
       }),
     );
     unsubs.push(
-      onEvent("statsUpdated", () => {
+      onTyped("statsUpdated", () => {
         qc.invalidateQueries({ queryKey: booksKeys.stats() });
         if (analyticsKeys) qc.invalidateQueries({ queryKey: analyticsKeys.all });
       }),

@@ -1,6 +1,7 @@
-import { useForm, type Resolver } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createBookSchema, type CreateBookInput, RATING_MIN, RATING_MAX } from "@/features/books/types/book";
+import { HttpError } from "@/lib/http";
 
 export type BookFormValues = CreateBookInput;
 
@@ -13,18 +14,18 @@ export function BookForm({
   onSubmit: (values: BookFormValues) => Promise<void> | void;
   submittingLabel?: string;
 }) {
-  const { register, handleSubmit, formState: { errors, isSubmitting }, setError } = useForm({
-    resolver: zodResolver(createBookSchema) as unknown as Resolver<any>,
+  const { register, handleSubmit, formState: { errors, isSubmitting }, setError } = useForm<BookFormValues>({
+    resolver: zodResolver(createBookSchema),
     defaultValues,
     mode: "onBlur",
   });
 
-  const submit = async (values: any) => {
+  const submit = async (values: BookFormValues) => {
     try {
       const toIso = (d?: string) => (d && d.length === 10 ? `${d}T00:00:00Z` : d);
-      await onSubmit({ ...values, publishedDate: toIso(values.publishedDate as unknown as string) } as BookFormValues);
-    } catch (err: any) {
-      const pd = err?.problem as { errors?: Record<string, string[]>; title?: string } | undefined;
+      await onSubmit({ ...values, publishedDate: toIso(values.publishedDate) });
+    } catch (err: unknown) {
+      const pd = err instanceof HttpError ? err.problem : undefined;
       if (pd?.errors) {
         Object.entries(pd.errors).forEach(([k, v]) => setError(k as keyof BookFormValues, { message: v?.[0] ?? "Invalid value" }));
       } else if (pd?.title) {
@@ -58,14 +59,14 @@ export function BookForm({
       </div>
       <div>
         <label className="block text-sm">Published date</label>
-        <input type="date" className="mt-1 w-full rounded border px-3 py-2" {...register("publishedDate" as any)} />
-        {"publishedDate" in errors && (errors as any).publishedDate?.message ? (
-          <p className="mt-1 text-sm text-red-600">{(errors as any).publishedDate.message}</p>
+        <input type="date" className="mt-1 w-full rounded border px-3 py-2" {...register("publishedDate")} />
+        {errors.publishedDate?.message ? (
+          <p className="mt-1 text-sm text-red-600">{errors.publishedDate.message}</p>
         ) : null}
       </div>
       <div>
         <label className="block text-sm">Rating</label>
-        <input type="number" min={RATING_MIN} max={RATING_MAX} className="mt-1 w-28 rounded border px-3 py-2" {...register("rating" as any, { valueAsNumber: true })} />
+        <input type="number" min={RATING_MIN} max={RATING_MAX} className="mt-1 w-28 rounded border px-3 py-2" {...register("rating", { valueAsNumber: true })} />
         {errors.rating?.message && (
           <p className="mt-1 text-sm text-red-600">{String(errors.rating?.message)}</p>
         )}

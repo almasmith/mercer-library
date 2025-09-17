@@ -55,7 +55,9 @@ export function useUpdateBook(id: string, ifMatch?: string) {
     mutationFn: (input: UpdateBookInput) => updateBook(id, input, ifMatch),
     onSuccess: (updated: Book) => {
       qc.setQueryData(booksKeys.detail(id), updated);
-      qc.invalidateQueries({ queryKey: booksKeys.list as unknown as string[] });
+      qc.invalidateQueries({
+        predicate: (q) => Array.isArray(q.queryKey) && q.queryKey[0] === booksKeys.all[0] && q.queryKey[1] === "list",
+      });
     },
   });
 }
