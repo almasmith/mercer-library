@@ -307,11 +307,12 @@
           "Books"
         ],
         "summary": "List books",
-        "description": "Lists books for the authenticated user with filtering, sorting, and pagination.",
+        "description": "Lists books for the authenticated user with filtering, sorting, and pagination. Note: genre filter is case-insensitive and matches substrings (contains).",
         "parameters": [
           {
             "name": "Genre",
             "in": "query",
+            "description": "Case-insensitive contains match against book genre (e.g., 'fan' matches 'Fantasy').",
             "schema": {
               "type": "string"
             }
@@ -792,11 +793,12 @@
           "Favorites"
         ],
         "summary": "List favorite books",
-        "description": "Returns a paged list of favorited books honoring filters, sort, and paging.",
+        "description": "Returns a paged list of favorited books honoring filters, sort, and paging. Note: genre filter is case-insensitive and matches substrings (contains).",
         "parameters": [
           {
             "name": "Genre",
             "in": "query",
+            "description": "Case-insensitive contains match against book genre (e.g., 'fan' matches 'Fantasy').",
             "schema": {
               "type": "string"
             }

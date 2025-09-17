@@ -65,9 +65,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Global unauthorized handling
   useEffect(() => {
-    const onUnauthorized = (e: Event) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const detail = (e as any).detail as { returnTo?: string } | undefined;
+    type UnauthorizedDetail = { returnTo?: string };
+    const onUnauthorized = (e: CustomEvent<UnauthorizedDetail>) => {
+      const detail = e.detail;
       logout();
       const returnTo = detail?.returnTo || window.location.pathname + window.location.search;
       window.location.assign(`/login?returnTo=${encodeURIComponent(returnTo)}`);

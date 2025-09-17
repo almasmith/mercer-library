@@ -5,6 +5,7 @@
 | BUG-001 | Favorite star highlight does not persist | Frontend → Favorites | High | Open |
 | BUG-002 | Overuse of `any`/`unknown` in TypeScript | Frontend → Types | Medium | Open |
 | BUG-003 | Filtering blanks entire page; only table should hide | Frontend → Books List | High | Open |
+| BUG-004 | Genre filter does not match partials (e.g., "fan" ≠ "Fantasy") | Frontend → Books Filters | Medium | Open |
 
 ---
 
@@ -97,3 +98,34 @@ Acceptance Criteria
 - Filters and pagination controls render regardless of result count.
 - Empty state replaces only the table body area; controls remain to adjust filters.
 - No full-page blank state when queries return zero items.
+
+---
+
+### BUG-004: Genre filter does not match partials (e.g., "fan" should match "Fantasy")
+
+- Area: Frontend → Books Filters (search/genre input, query serialization)
+- Severity: Medium (discoverability/UX)
+
+Description
+- The genre filter requires an exact match. Typing a partial string like `fan` does not return books with `Fantasy` genre. Users expect substring/contains matching for quick filtering.
+
+Reproduction Steps
+1. Navigate to `/` (Books list) with data containing a `Fantasy` book.
+2. In the Genre filter, type `fan`.
+3. Observe that the list does not include `Fantasy` items.
+
+Expected
+- Genre filter performs case-insensitive substring matching (e.g., `fan` → `Fantasy`).
+- Optionally, suggestions indicate matched genres while allowing free text.
+
+Actual
+- Only exact (or case-sensitive) matches are returned; partial inputs yield zero results.
+
+Suspected Causes
+- Client passes `genre` query param expecting server-side contains, but API interprets as equality.
+- Or client-side pre-filtering (if any) uses strict equality instead of `includes`/normalized match.
+
+Acceptance Criteria
+- Typing a partial string (e.g., `fan`) returns books whose normalized genre includes the substring, case-insensitive.
+- URL query remains `genre=fan`; server or client logic ensures contains behavior.
+- Existing exact-match behavior remains supported when the full genre is entered.

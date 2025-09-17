@@ -97,8 +97,11 @@ namespace Library.Api.Services
             var usingSqlite = _db.Database.IsSqlite();
             if (!string.IsNullOrWhiteSpace(p.Genre))
             {
-                var genre = p.Genre.Trim();
-                query = query.Where(b => b.Genre != null && b.Genre.ToLower() == genre.ToLower());
+                var g = p.Genre.Trim();
+                if (g.Length > 0)
+                {
+                    query = query.Where(b => b.Genre != null && b.Genre.ToLower().Contains(g.ToLower()));
+                }
             }
 
             if (p.MinRating.HasValue)
